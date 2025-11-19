@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Kstacking – 2026 Morning Market Brief</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg: #020617;
+      --bg-elevated: #020617;
+      --card: #020617;
+      --card-soft: #020617;
+      --card-border: #1f2937;
+      --accent: #4f46e5;
+      --accent-soft: rgba(79, 70, 229, 0.18);
+      --accent-strong: #22c55e;
+      --accent-red: #f97373;
+      --accent-yellow: #facc15;
+      --text: #e5e7eb;
+      --text-soft: #94a3b8;
+      --muted: #64748b;
+      --chip-bg: #020617;
+      --chip-border: #1e293b;
+      --shadow-soft: 0 18px 50px rgba(15, 23, 42, 0.8);
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-pill: 999px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top left, #0f172a 0, #020617 40%);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 16px;
+    }
+
+    .shell {
+      max-width: 1220px;
+      margin: 0 auto;
+      border-radius: 26px;
+      padding: 18px 20px 70px;
+      background: radial-gradient(
+          circle at 0 0,
+          rgba(56, 189, 248, 0.06),
+          transparent 55%
+        ),
+        radial-gradient(
+          circle at 100% 0,
+          rgba(180, 83, 9, 0.12),
+          transparent 40%
+        ),
+        #020617;
+      box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.06),
+        0 24px 80px rgba(15, 23, 42, 0.95);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .shell {
+  padding-top: 90px; /* prevents overlap */
+}
+
+
+    /* --- TOP: NAV BAR ----------------------------------------------------- */
+
+    .top-nav {
+  width: 100%;
+  height: 75px; /* You can adjust */
+  position: fixed;     /* <— THIS MAKES IT FOLLOW YOU */
+  top: 0;
+  left: 0;
+  z-index: 9999;       /* <— ALWAYS ON TOP */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  background: rgba(10, 18, 28, 0.95); /* clean dark + blur */
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-logo {
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 0, #fde68a 0, #0bf517 35%, #713f12 90%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 7px 18px rgba(0, 0, 0, 0.6);
+      position: relative;
+    }
+
+    .brand-logo span {
+      font-weight: 800;
+      color: #020617;
+      font-size: 20px;
+      transform: translateY(1px);
+    }
+
+    .brand-logo::after {
+      content: "🤑";
+      position: absolute;
+      font-size: 16px;
+      left: -6px;
+      top: -9px;
+      transform: rotate(-18deg);
+    }
+
+    .brand-main {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .brand-title {
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .brand-title span:nth-child(2) {
+      font-size: 11px;
+      font-weight: 500;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(22, 163, 74, 0.16);
+      border: 1px solid rgba(22, 163, 74, 0.4);
+      color: #bbf7d0;
+    }
+
+    .brand-sub {
+      font-size: 12px;
+      color: var(--text-soft);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .nav-links button {
+      background: transparent;
+      border: none;
+      color: inherit;
+      font: inherit;
+      padding: 3px 4px;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .nav-links button.active {
+      color: #e5e7eb;
+      font-weight: 600;
+    }
+
+    .nav-links button.active::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -5px;
+      height: 2px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #38bdf8, #22c55e, #facc15);
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+    }
+
+    .nav-badge {
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      background: rgba(15, 23, 42, 0.85);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-soft);
+    }
+
+    .nav-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 10px rgba(34, 197, 94, 0.9);
+    }
+
+    .nav-time {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .top-tickers-bar {
+  width: 100%;
+  background: #0b1220;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  padding: 12px 30px;
+  margin-top: 0px; /* below navbar */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+}
+
+.top-tickers-bar .label {
+  color: #94a3b8;
+  font-weight: 600;
+  margin-right: 10px;
+}
+
+.top-tickers-bar .ticker {
+  margin-right: 14px;
+  color: #e5e7eb;
+}
+
+.top-tickers-bar .up {
+  color: #22c55e;
+  font-weight: bold;
+}
+
+.top-tickers-bar .down {
+  color: #ef4444;
+  font-weight: bold;
+}
+
+.mag7-section, .mentions-section {
+  display: flex;
+  align-items: center;
+}
+
+    /* --- MARKET STRIP ----------------------------------------------------- */
+
+    .market-strip {
+      margin-bottom: 18px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 0 0, rgba(56, 189, 248, 0.13), transparent 60%),
+        rgba(15, 23, 42, 0.96);
+      border: 1px solid rgba(51, 65, 85, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      font-size: 11px;
+      color: var(--text-soft);
+    }
+
+    .strip-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .strip-chip {
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .strip-markets {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .mini-quote {
+      padding: 3px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(30, 64, 175, 0.9);
+      background: rgba(15, 23, 42, 0.96);
+      display: inline-flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+
+    .mini-quote span.ticker {
+      font-weight: 600;
+      font-size: 11px;
+      color: #e5e7eb;
+    }
+
+    .mini-quote span.move.green {
+      color: #4ade80;
+    }
+
+    .mini-quote span.move.red {
+      color: #f97373;
+    }
+
+    /* --- MAIN CONTENT ----------------------------------------------------- */
+
+    .headline {
+      margin-bottom: 10px;
+    }
+
+    .headline h1 {
+      font-size: 26px;
+      font-weight: 800;
+    }
+
+    .headline span {
+      color: #e5e7eb;
+    }
+
+    .headline-sub {
+      font-size: 13px;
+      color: var(--text-soft);
+      margin-top: 4px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 18px;
+      margin-top: 14px;
+    }
+
+    .card {
+      background: radial-gradient(circle at 0 0, rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.97));
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(51, 65, 85, 0.9);
+      padding: 16px 18px;
+      box-shadow: var(--shadow-soft);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      gap: 8px;
+    }
+
+    .card-title {
+      font-size: 13px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pill {
+      font-size: 10px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      color: var(--text-soft);
+      background: rgba(15, 23, 42, 0.85);
+    }
+
+    .card-body {
+      font-size: 13px;
+      color: var(--text-soft);
+      line-height: 1.5;
+    }
+
+    .brief-line {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 9px 0;
+      border-bottom: 1px dashed rgba(55, 65, 81, 0.7);
+    }
+
+    .brief-line:last-of-type {
+      border-bottom: none;
+    }
+
+    .bullet-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      margin-top: 5px;
+      background: #22c55e;
+      box-shadow: 0 0 10px rgba(34, 197, 94, 0.9);
+    }
+
+    .brief-main {
+      color: #e5e7eb;
+      font-weight: 500;
+    }
+
+    .brief-meta {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .chips-row {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      font-size: 11px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      border: 1px solid var(--chip-border);
+      background: var(--chip-bg);
+      color: var(--text-soft);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .chip.green {
+      border-color: rgba(34, 197, 94, 0.65);
+      background: rgba(22, 163, 74, 0.18);
+      color: #bbf7d0;
+    }
+
+    .chip.red {
+      border-color: rgba(239, 68, 68, 0.65);
+      background: rgba(127, 29, 29, 0.2);
+      color: #fecaca;
+    }
+
+    .chip.purple {
+      border-color: rgba(168, 85, 247, 0.5);
+      background: rgba(76, 29, 149, 0.4);
+      color: #f5d0fe;
+    }
+
+    /* KEY LEVELS & WATCHLIST ----------------------------------------------- */
+
+    .levels-grid {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .mini-card {
+      padding: 10px 10px 11px;
+      border-radius: var(--radius-md);
+      background: radial-gradient(circle at 0 0, rgba(15, 23, 42, 0.7), rgba(15, 23, 42, 0.96));
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      font-size: 12px;
+    }
+
+    .mini-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .mini-title strong {
+      color: #e5e7eb;
+      font-size: 12px;
+    }
+
+    .mini-main {
+      font-size: 12px;
+      color: var(--text-soft);
+    }
+
+    .mini-main strong {
+      color: #e5e7eb;
+    }
+
+    .mini-tag {
+      margin-top: 6px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .watchlist-grid {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 9px;
+    }
+
+    .watch-tile {
+      padding: 9px 9px 10px;
+      border-radius: 13px;
+      background: rgba(15, 23, 42, 0.98);
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      font-size: 11px;
+    }
+
+    .watch-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .watch-ticker {
+      font-weight: 600;
+      font-size: 11px;
+      letter-spacing: 0.04em;
+    }
+
+    .watch-move.green {
+      color: #4ade80;
+      font-weight: 600;
+    }
+
+    .watch-move.red {
+      color: #f97373;
+      font-weight: 600;
+    }
+
+    .watch-sub {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .note {
+      margin-top: 10px;
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .note strong {
+      color: #e5e7eb;
+    }
+
+    /* SPYTRADER SECTION ----------------------------------------------------- */
+
+    .spytrader {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+      gap: 16px;
+    }
+
+    .spy-body {
+      font-size: 13px;
+      color: var(--text-soft);
+      line-height: 1.6;
+    }
+
+    .spy-tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .spy-email-card {
+      background: rgba(15, 23, 42, 0.96);
+      border-radius: 18px;
+      border: 1px solid rgba(75, 85, 99, 0.8);
+      padding: 12px 14px;
+      font-size: 11px;
+      color: var(--text-soft);
+      line-height: 1.6;
+    }
+
+    .spy-email-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .badge-soft {
+      font-size: 10px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(30, 64, 175, 0.55);
+      border: 1px solid rgba(59, 130, 246, 0.9);
+      color: #bfdbfe;
+    }
+
+    .email-meta {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .email-section-title {
+      margin-top: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #e5e7eb;
+    }
+
+    .email-line {
+      font-size: 11px;
+      color: var(--text-soft);
+    }
+
+    .email-line strong {
+      color: #e5e7eb;
+    }
+
+    /* NEWS FEED ------------------------------------------------------------- */
+
+    .news-feed {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      font-size: 12px;
+    }
+
+    .news-card {
+      padding: 9px 11px 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(51, 65, 85, 0.9);
+      background: rgba(15, 23, 42, 0.96);
+    }
+
+    .news-tag {
+      font-size: 10px;
+      color: var(--muted);
+      margin-bottom: 3px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .news-title {
+      color: #e5e7eb;
+      font-weight: 500;
+    }
+
+    .news-meta {
+      margin-top: 4px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    /* REDDITORS' PLAYBOOK -------------------------------------------------- */
+
+    .reddit-deck {
+      margin-top: 18px;
+    }
+
+    .reddit-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .reddit-badge {
+      font-size: 10px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(251, 191, 36, 0.7);
+      background: rgba(120, 53, 15, 0.7);
+      color: #fef3c7;
+    }
+
+    .reddit-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--text-soft);
+    }
+
+    .reddit-col h4 {
+      font-size: 12px;
+      color: #e5e7eb;
+      margin-bottom: 6px;
+    }
+
+    .reddit-list {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .reddit-list li {
+      padding: 4px 0;
+      border-bottom: 1px dashed rgba(55, 65, 81, 0.6);
+    }
+
+    .reddit-list li:last-child {
+      border-bottom: none;
+    }
+
+    .reddit-tag {
+      display: inline-block;
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      margin-left: 4px;
+      color: var(--muted);
+    }
+
+    /* TICKER BAR ------------------------------------------------------------ */
+
+    .ticker-bar {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 8px 20px;
+      border-top: 1px solid rgba(30, 64, 175, 0.9);
+      background: radial-gradient(circle at 50% 0, rgba(30, 64, 175, 0.5), #020617);
+      font-size: 11px;
+      color: var(--text-soft);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .ticker-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .tick {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+
+    .tick strong {
+      color: #e5e7eb;
+      font-size: 11px;
+    }
+
+    .tick span.green {
+      color: #4ade80;
+    }
+
+    .tick span.red {
+      color: #f97373;
+    }
+
+    .ticker-right {
+      font-size: 10px;
+      color: var(--muted);
+    }
+
+    /* RESPONSIVE ------------------------------------------------------------ */
+
+    @media (max-width: 960px) {
+      .shell {
+        padding: 16px 14px 68px;
+      }
+
+      .layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .spytrader {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .news-feed {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .reddit-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    @media (max-width: 720px) {
+      .top-nav {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .nav-links {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .market-strip {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .ticker-bar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+    .join-bar {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    padding: 10px 18px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px; /* smaller text */
+    margin-top: 20px; /* spacing below the nav */
+}
+
+.join-bar input {
+    flex: 1;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    padding: 8px 12px;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 14px;
+}
+
+.join-bar button {
+    background: #16a34a;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 6px;
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.join-bar button:hover {
+    background: #22c55e;
+}
+
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <!-- TOP NAV -->
+    <header class="top-nav">
+      <div class="brand">
+        <div class="brand-logo">
+          <span>K$</span>
+        </div>
+        <div class="brand-main">
+          <div class="brand-title">
+            <span>KSTACKING</span>
+            <span>Pre-market brief</span>
+          </div>
+          <div class="brand-sub">
+            Your Pre-Market brief before the opening bell.
+          </div>
+        </div>
+      </div>
+
+      <nav class="nav-links">
+        <button class="active">Morning Brief</button>
+        <button>Markets</button>
+        <button>Watchlist</button>
+        <button>SpyTrader</button>
+      </nav>
+
+      <div class="nav-right">
+        <div class="nav-badge">
+          <span class="nav-dot"></span>
+          Live pre-market • 10:00 PM ET
+        </div>
+        <div class="nav-time">
+          Last updated: 10:00 PM ET · 2025
+        </div>
+      </div>
+    </header>
+
+    <div class="join-bar">
+  <span>Get SPY Key Levels Daily — Free:</span>
+  <input type="email" placeholder="Your email">
+  <button>Join</button>
+</div>
+
+
+    <div class="top-tickers-bar">
+  <div class="mag7-section">
+    <span class="label">MAG7</span>
+    <span class="ticker">NVDA <span class="down">-0.06%</span></span>
+    <span class="ticker">META <span class="up">+0.01%</span></span>
+    <span class="ticker">TSLA <span class="down">-0.42%</span></span>
+    <span class="ticker">AAPL <span class="down">-0.50%</span></span>
+    <span class="ticker">MSFT <span class="down">-0.26%</span></span>
+    <span class="ticker">AMZN <span class="up">+0.15%</span></span>
+    <span class="ticker">GOOGL <span class="up">+0.41%</span></span>
+
+  </div>
+
+  <div class="mentions-section">
+    <span class="label">Most Mentioned Today</span>
+    <span class="ticker">NVDA <span class="up">↑</span></span>
+    <span class="ticker">META <span class="up">↑</span></span>
+    <span class="ticker">MSTR <span class="up">↑</span></span>
+    <span class="ticker">NBIS <span class="up">↑</span></span>
+    <span class="ticker">GOOGL <span class="up">↑</span></span>
+    <span class="ticker">QQQ <span class="down">↓</span></span>
+    <span class="ticker">HOOD <span class="up">↑</span></span>
+  </div>
+</div>
+
+    <!-- MARKET STRIP -->
+    <section class="market-strip">
+      <div class="strip-left">
+        <div class="strip-chip">
+          🌍 US Futures • Tech selloff • AI rails
+        </div>
+        <div class="strip-markets">
+          <div class="mini-quote">
+            <span class="ticker">SPY</span>
+            <span>-0.30%</span>
+            <span class="move red">4th red day stretch</span>
+          </div>
+          <div class="mini-quote">
+            <span class="ticker">QQQ</span>
+            <span>-0.50%</span>
+            <span class="move red">Tech-led pressure</span>
+          </div>
+          <div class="mini-quote">
+            <span class="ticker">VIX</span>
+            <span>↑</span>
+            <span class="move green">Volatility on watch</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="strip-right">
+        <span>👀 Futures flat after 4th SPX loss · NVDA earnings + safety flows in Treasuries / yen.</span>
+      </div>
+    </section>
+
+    <!-- HEADLINE -->
+    <section class="headline">
+      <h1><span>Your daily market brief, before the world wakes up.</span></h1>
+      <p class="headline-sub">
+        Macro mood, key levels, and my personal watchlist, so I’m ready when the opening bell rings.
+      </p>
+    </section>
+
+    <!-- MAIN LAYOUT -->
+    <section class="layout">
+      <!-- LEFT: MORNING BRIEF -->
+      <article class="card">
+        <header class="card-header">
+          <div class="card-title">
+            <span>Morning Brief</span>
+          </div>
+          <div class="pill">Prototype • Static HTML</div>
+        </header>
+
+        <div class="card-body">
+          <h2 style="font-size: 15px; color:#e5e7eb; margin-bottom:8px;">
+            Narrative before the opening bell
+          </h2>
+
+          <p style="font-size:13px; color:var(--text-soft); margin-bottom:8px;">
+            Snapshot of what matters before the bell — macro, index levels, and the main
+            narrative driving risk-on / risk-off.
+          </p>
+
+          <div class="brief-line">
+            <div class="bullet-dot"></div>
+            <div>
+              <div class="brief-main">
+                Futures tread water after a 4th straight SPX red day as tech-led selling cools risk appetite.
+              </div>
+              <div class="brief-meta">
+                S&amp;P 500 coming off a valuation-driven slide; tone is cautious, not full panic yet.
+              </div>
+            </div>
+          </div>
+
+          <div class="brief-line">
+            <div class="bullet-dot" style="background:#facc15; box-shadow:0 0 8px rgba(250,204,21,0.9);"></div>
+            <div>
+              <div class="brief-main">
+                Safety flows show up in Treasuries and yen as investors hedge the global selloff.
+              </div>
+              <div class="brief-meta">
+                Foreign demand for US debt is mixed, but Japan steps up buying while dollar/yen steadies.
+              </div>
+            </div>
+          </div>
+
+          <div class="brief-line">
+            <div class="bullet-dot" style="background:#38bdf8; box-shadow:0 0 8px rgba(56,189,248,0.9);"></div>
+            <div>
+              <div class="brief-main">
+                All eyes on NVDA — options pricing in a potential $320B swing around earnings.
+              </div>
+              <div class="brief-meta">
+                NVDA is the top Reddit mention; results could reset the Mag7 and decide the next leg for SPX.
+              </div>
+            </div>
+          </div>
+
+          <div class="chips-row">
+            <div class="chip green">Bias: Cautious after 4th red day ⚠️</div>
+            <div class="chip">Catalyst: NVDA earnings &amp; guidance 🎯</div>
+            <div class="chip purple">Theme: “Safety flows vs. AI hype”</div>
+          </div>
+
+          <h3 style="margin-top:16px;font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:var(--muted);">
+            Key levels I’m watching
+          </h3>
+
+          <div class="levels-grid">
+  <!-- SPY intraday pivot -->
+  <div class="mini-card">
+    <div class="mini-title">
+      <strong>SPY ⚡ intraday pivot</strong>
+      <span>$663.00</span>
+    </div>
+    <div class="mini-main">
+      Above = call bias, below = chop / downside.
+    </div>
+    <div class="mini-tag">Lines up with current bounce zone.</div>
+  </div>
+
+  <!-- Bull path -->
+  <div class="mini-card">
+    <div class="mini-title">
+      <strong>Bull path 💜</strong>
+      <span>$673–$682</span>
+    </div>
+    <div class="mini-main">
+      If momentum + volume confirm, this is my <strong>A-setup</strong> upside path.
+    </div>
+    <div class="mini-tag">Target zone for calls / runners above resistance.</div>
+  </div>
+
+  <!-- Bear path -->
+  <div class="mini-card">
+    <div class="mini-title">
+      <strong>Bear path 🔻</strong>
+      <span>$654</span>
+    </div>
+    <div class="mini-main">
+      Break &amp; hold below here = risk-off, puts / defensive mode on.
+    </div>
+    <div class="mini-tag">First demand box; deeper flush opens lower zone.</div>
+  </div>
+</div>
+
+      </article>
+
+      <!-- RIGHT: WATCHLIST & SIGNALS -->
+      <aside class="card">
+        <header class="card-header">
+          <div class="card-title">
+            <span>Watchlist &amp; Signals</span>
+          </div>
+          <div class="pill">Kstacking prototype</div>
+        </header>
+
+        <div class="card-body">
+          <p style="font-size:13px;margin-bottom:6px;">
+            Core names I monitor every morning — growth engines, option premium machines,
+            and index anchors I track for direction.
+          </p>
+
+          <div class="watchlist-grid">
+            <div class="watch-tile">
+              <div class="watch-head">
+                <div class="watch-ticker">SPY</div>
+                <div class="watch-move red">-0.40%</div>
+              </div>
+              <div class="watch-sub">
+                Index backbone · tracking if CROM “major buy” zone turns into real bounce.
+              </div>
+            </div>
+
+            <div class="watch-tile">
+              <div class="watch-head">
+                <div class="watch-ticker">NVDA</div>
+                <div class="watch-move green">+0.10%</div>
+              </div>
+              <div class="watch-sub">
+                Earnings on deck · options imply huge move, Mag7 sentiment hinge.
+              </div>
+            </div>
+
+            <div class="watch-tile">
+              <div class="watch-head">
+                <div class="watch-ticker">META</div>
+                <div class="watch-move green">+0.20%</div>
+              </div>
+              <div class="watch-sub">
+                Wins FTC antitrust trial · watching if relief rally sticks.
+              </div>
+            </div>
+
+            <div class="watch-tile">
+              <div class="watch-head">
+                <div class="watch-ticker">BTC</div>
+                <div class="watch-move green">+1.30%</div>
+              </div>
+              <div class="watch-sub">
+                Rebounds after dipping below $90K · checking if crypto leads risk back on.
+              </div>
+            </div>
+          </div>
+
+          <div class="note">
+            <strong>SpyTrader signal:</strong> when this watchlist, macro, and my SpyTrader
+            forecast email all line up, that’s my **A-setup** for the day.
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <!-- SPYTRADER SECTION -->
+    <section class="spytrader">
+      <article class="card">
+        <header class="card-header">
+          <div class="card-title">
+            <span>SpyTrader 🤖 AI Agent</span>
+          </div>
+          <div class="pill">Runs on Python + Webull + SMTP</div>
+        </header>
+        <div class="spy-body">
+          SpyTrader is my custom AI-powered trading agent that watches SPY on 1-minute
+          candles, tracks MACD, momentum streaks, volume surges, and my bull/bear price
+          paths. When everything lines up, it automatically emails me a trade brief like a
+          personal analyst — and now I layer it with CROM-style projections and Reddit sentiment.
+          <div class="spy-tag-row">
+            <div class="chip">1-min candles</div>
+            <div class="chip">MACD trend</div>
+            <div class="chip">Momentum score</div>
+            <div class="chip">Volume scanner</div>
+            <div class="chip purple">Bull / bear forecast model</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <header class="card-header">
+          <div class="card-title">
+            <span>SpyTrader Ai agent 📩 Email Alert</span>
+          </div>
+          <div class="pill">Sample output</div>
+        </header>
+        <div class="spy-email-card">
+          <div class="spy-email-header">
+            <div style="font-weight:600; color:#e5e7eb;">
+              SPY Trade Alert ✨ Major Buy Zone 👀
+            </div>
+            <div class="badge-soft">Live from SpyOp</div>
+          </div>
+
+          <div class="email-meta">
+            SPY: $661.20 (Live) · Path toward 660 with volatility elevated.
+          </div>
+
+          <div class="email-section-title">👀 SPY Trade Signal (Rebound Setup):</div>
+          <p class="email-line">
+            MACD Trend: <strong>Trying to turn</strong> after deep bearish stretch · Sentiment:
+            <strong>extreme negative</strong> with bottoming chatter.
+          </p>
+          <p class="email-line">
+            Momentum Score: <strong>Mixed</strong> (bounce attempts but sellers still active).
+          </p>
+          <p class="email-line">
+            Volatility: <strong>Spike on watch</strong> — any good news could fuel a sharp squeeze.
+          </p>
+
+          <p class="email-section-title">Risk / Reward Snapshot:</p>
+          <p class="email-line">
+            Suggested Zone: <strong>$648–$663</strong> · Upside idea:
+            <strong> test toward $661–$670</strong> if squeeze ignites ·
+            Downside risk: <strong>breaks below $648</strong>.
+          </p>
+
+          <p class="email-section-title">Bull/Bear Forecast Model:</p>
+          <p class="email-line">
+            📈 Bull Target: <strong>$670.40</strong> in <strong>240.0h</strong> (if momentum rebuilds).
+          </p>
+          <p class="email-line">
+            📉 Bear Target: <strong>$648.33</strong> in <strong>183.4h</strong> (if selloff resumes).
+          </p>
+        </div>
+      </article>
+    </section>
+
+    <!-- NEWS FEED -->
+    <section class="news-feed">
+      <article class="news-card">
+        <div class="news-tag">Macro Theme</div>
+        <div class="news-title">
+          S&amp;P 500 logs a 4th straight down day as valuation worries bite and futures open little changed.
+        </div>
+        <div class="news-meta">
+          Tone: cautious risk-off · watching Treasuries, yen and yields as investors look for safety.
+        </div>
+      </article>
+
+      <article class="news-card">
+        <div class="news-tag">NVDA Catalyst</div>
+        <div class="news-title">
+          Nvidia options price in a potential $320B swing around earnings, making it the main market driver.
+        </div>
+        <div class="news-meta">
+          Top Reddit mention · results could move Mag7, QQQ and broader SPX direction.
+        </div>
+      </article>
+
+      <article class="news-card">
+        <div class="news-tag">Crypto &amp; Risk</div>
+        <div class="news-title">
+          Bitcoin rebounds after falling below $90,000 — a 7-month low — as traders test risk appetite.
+        </div>
+        <div class="news-meta">
+          Crypto bounce helps, but tape still fragile; looking for confirmation from equities.
+        </div>
+      </article>
+    </section>
+
+    <!-- REDDITORS' PLAYBOOK: 10 THINGS INVESTORS CHECK -->
+    <section class="reddit-deck">
+      <article class="card">
+        <div class="reddit-title-row">
+          <div class="card-title">
+            <span>Investor's Playbook</span>
+          </div>
+          <span class="reddit-badge">Top 10 things I check before trading</span>
+        </div>
+
+        <p style="font-size:13px;color:var(--text-soft);margin-bottom:10px;">
+          Builtwhat actually matters before the market opens — a checklist of the 10 things.
+        </p>
+
+        <div class="reddit-grid">
+          <div class="reddit-col">
+            <h4>Setup &amp; risk</h4>
+            <ul class="reddit-list">
+              <li>1. <strong>Macro mood</strong> (Futures, VIX, rates) <span class="reddit-tag">risk-on / risk-off</span></li>
+              <li>2. <strong>Key levels</strong> (SPY bull / bear paths) <span class="reddit-tag">where can it flip?</span></li>
+              <li>3. <strong>Reddit sentiment</strong> on my tickers (SOFI, NVDA, TSLA, APP) <span class="reddit-tag">crowd mood</span></li>
+              <li>4. <strong>Risk meter</strong> for the day (size, stops, max loss) <span class="reddit-tag">don’t blow up</span></li>
+              <li>5. <strong>Upcoming catalysts</strong> (earnings, FOMC, tariffs, jobs data) <span class="reddit-tag">news landmines</span></li>
+            </ul>
+          </div>
+
+          <div class="reddit-col">
+            <h4>Plays &amp; learning</h4>
+            <ul class="reddit-list">
+              <li>6. <strong>Options radar</strong> (volume, unusual flow, 0DTE noise filter) <span class="reddit-tag">signal > noise</span></li>
+              <li>7. <strong>Income corner</strong> (dividends, CSP / CC ideas) <span class="reddit-tag">cashflow</span></li>
+              <li>8. <strong>Position check</strong> (size vs. account, conviction, time frame) <span class="reddit-tag">journal</span></li>
+              <li>9. <strong>Red / green plan</strong> (profit target + stop level) <span class="reddit-tag">exit rules</span></li>
+              <li>10. <strong>One lesson</strong> I’m applying today from Reddit / books / Kstacking <span class="reddit-tag">level up</span></li>
+            </ul>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- TICKER BAR -->
+    <footer class="ticker-bar">
+      <div class="ticker-row">
+        <div class="tick">
+          <strong>SPY</strong>
+          <span>661.13</span>
+          <span class="green">+0.16%</span>
+        </div>
+        <div class="tick">
+          <strong>QQQ</strong>
+          <span>597.30</span>
+          <span class="green">+0.16%</span>
+        </div>
+        <div class="tick">
+          <strong>NVDA</strong>
+          <span>•</span>
+          <span class="green">Earnings catalyst</span>
+        </div>
+        <div class="tick">
+          <strong>META</strong>
+          <span>•</span>
+          <span class="green">FTC win</span>
+        </div>
+        <div class="tick">
+          <strong>BTC</strong>
+          <span>↑</span>
+          <span class="green">Off 7-month low</span>
+        </div>
+      </div>
+      <div class="ticker-right">
+    © 2026 Kstacking × SpyTrader — All rights reserved.
+</div>
+
+    </footer>
+  </main>
+</body>
+</html>
