@@ -1152,6 +1152,19 @@
   margin-top: 0px; /* keep nav tight under banner */
 }
 
+@media (max-width: 768px) {
+  .kstacking-banner {
+    height: auto;         /* no fixed height on phones */
+    padding: 12px 0;
+  }
+
+  .kstacking-banner img {
+    width: 100%;          /* fit screen width */
+    height: auto;         /* keep aspect ratio */
+    object-fit: contain;  /* no cropping */
+  }
+}
+
 
 
 
