@@ -1130,6 +1130,31 @@
   margin-top: 10px;
 }
 
+/* ============== FULL-WIDTH BANNER ============== */
+
+.kstacking-banner {
+  width: 100%;
+  height: 350px; /* <-- adjust this to make it bigger/smaller */
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #07111f; /* matches your theme */
+}
+
+.kstacking-banner img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.top-nav {
+  margin-top: 0px; /* keep nav tight under banner */
+}
+
+
+
+
 
 
 
@@ -1137,47 +1162,53 @@
 </head>
 <body>
   <main class="shell">
-    <!-- TOP NAV -->
-    <header class="top-nav">
-      <div class="brand">
-        <div class="brand-logo">
-          <span>K$</span>
-        </div>
-        <div class="brand-main">
-          <div class="brand-title">
-            <span>KSTACKING</span>
-            <span>Pre-market brief</span>
-          </div>
-          <div class="brand-sub">
-            Your Pre-Market brief before the opening bell.
-          </div>
-        </div>
+<!-- FULL-WIDTH BANNER -->
+<div class="kstacking-banner">
+  <img src="/images/xbanner.png" alt="Kstacking Banner">
+</div>
+
+<!-- TOP NAV -->
+<header class="top-nav">
+  <div class="brand">
+    <div class="brand-logo">
+      <span>K$</span>
+    </div>
+    <div class="brand-main">
+      <div class="brand-title">
+        <span>KSTACKING</span>
+        <span>Pre-market brief</span>
       </div>
-
-      <nav class="nav-links">
-        <button class="active">Morning Brief</button>
-        <button>Markets</button>
-        <button>Watchlist</button>
-        <button>SpyTrader</button>
-      </nav>
-
-      <div class="nav-right">
-        <div class="nav-badge">
-          <span class="nav-dot"></span>
-          Live pre-market • 6:30 am ET
-        </div>
-        <div class="nav-time">
-          Last updated: 6:30 am ET · 2025
-        </div>
+      <div class="brand-sub">
+        Your Pre-Market brief before the opening bell.
       </div>
-    </header>
+    </div>
+  </div>
 
-    <div class="ks-social ks-right">
+  <nav class="nav-links">
+    <button class="active">Morning Brief</button>
+    <button>Markets</button>
+    <button>Watchlist</button>
+    <button>SpyTrader</button>
+  </nav>
+
+  <div class="nav-right">
+    <div class="nav-badge">
+      <span class="nav-dot"></span>
+      Live pre-market • 8:00 am ET
+    </div>
+    <div class="nav-time">
+      Last updated: 8:00 am ET · 2025
+    </div>
+  </div>
+</header>
+
+<div class="ks-social ks-right">
   <a href="https://x.com/Kstackingdaily" target="_blank" class="ks-social-btn x-icon">
     <span>𝕏</span>
   </a>
-
 </div>
+
+
 
 
 
