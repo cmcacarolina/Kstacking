@@ -1078,6 +1078,59 @@
   font-weight: 600;
 }
 
+.ks-social {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 10px;
+}
+
+.ks-social-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #0a0f1f;
+  border: 1px solid #1f2937;
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+.ks-social-btn:hover {
+  border-color: #22c55e;   /* your neon green */
+  box-shadow: 0 0 12px #22c55e55;
+  transform: translateY(-3px);
+}
+
+.ks-social-btn span {
+  font-size: 20px;
+  color: #e5e7eb; /* light text */
+}
+
+.ks-social-btn img {
+  width: 22px;
+  height: 22px;
+  filter: invert(90%); /* white reddit icon */
+}
+
+.x-icon span {
+  font-weight: bold;
+}
+
+.reddit-icon img:hover {
+  filter: invert(70%) sepia(100%) saturate(800%) hue-rotate(350deg); /* neon orange */
+}
+
+.ks-right {
+  display: flex;
+  justify-content: flex-end;   /* pushes icons to the right */
+  width: 100%;
+  margin-top: 10px;
+}
+
+
 
 
   </style>
@@ -1118,6 +1171,18 @@
         </div>
       </div>
     </header>
+
+    <div class="ks-social ks-right">
+  <a href="https://x.com/Kstackingdaily" target="_blank" class="ks-social-btn x-icon">
+    <span>𝕏</span>
+  </a>
+
+  <a href="https://reddit.com/r/kstacking" target="_blank" class="ks-social-btn reddit-icon">
+    <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/reddit.svg">
+  </a>
+</div>
+
+
 
     <div class="join-bar">
   <form action="https://formsubmit.co/kstackingdaily@gmail.com" method="POST">
