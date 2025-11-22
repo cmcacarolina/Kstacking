@@ -1163,12 +1163,131 @@
     height: auto;         /* keep aspect ratio */
     object-fit: contain;  /* no cropping */
   }
+
+}
+
+.mint-sunday-banner img {
+  width: 100%;
+  max-height: 340px;
+  object-fit: cover;
+  border-radius: 18px;
+  margin-bottom: 26px;
+}
+
+.mint-sunday-note {
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #34e17a; /* KS Green Mint */
+  margin-top: -10px;
+  margin-bottom: 30px;
+  padding: 10px 0;
+  letter-spacing: 0.5px;
+  text-shadow: 0 0 10px rgba(52, 225, 122, 0.35);
+}
+
+.mint-sunday-note span {
+  background: rgba(0, 0, 0, 0.35);
+  padding: 8px 18px;
+  border-radius: 12px;
+  border: 1px solid rgba(52, 225, 122, 0.4);
+  backdrop-filter: blur(4px);
+}
+
+.mint-sunday-banner {
+  margin-top: 80px !important;
+  margin-bottom: 60px !important;
+}
+
+.mint-sunday-note {
+  margin-top: 50px !important;
+  margin-bottom: 80px !important;
+}
+
+.hero-section,
+.header-section,
+.page-header,
+.section-title {
+  margin-bottom: 90px !important;
+  padding-bottom: 40px !important;
+}
+
+.mint-spacer {
+  height: 90px;   /* try 60 first, then 80 if you want more */
+}
+
+.mint-sunday-banner img {
+  width: 100%;
+  border-radius: 24px;
+  display: block;
+}
+
+/* extra space below before the green pill */
+.mint-sunday-note {
+  margin-top: 40px;
+  margin-bottom: 80px;
+}
+
+/* Full IMAX wrapper */
+.mint-imax {
+  width: 100%;
+  padding-top: 80px !important;
+  padding-bottom: 80px !important;
+  margin-top: 80px !important;
+  margin-bottom: 80px !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Centered inner wrapper */
+.mint-imax-inner {
+  width: 100%;
+  max-width: 1400px;
+}
+
+.mint-imax-inner img {
+  width: 100%;
+  border-radius: 28px;
+  display: block;
+}
+
+.mint-sunday-note {
+  margin-top: 40px;
+  font-size: 1.2rem;
+  color: #34e17a;
+}
+
+.mint-imax-inner img {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.mint-imax-inner:hover img {
+  transform: translateY(-4px);
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.55);
+}
+
+.mint-imax-inner img {
+  transition: box-shadow 0.35s ease, transform 0.35s ease;
+}
+
+.mint-imax-inner:hover img {
+  transform: translateY(-6px);
+  box-shadow: 0 0 22px #00ff80,      /* outer neon glow */
+              0 0 45px #00ff80aa,   /* soft neon bloom */
+              0 0 75px #00ff8066;   /* wide neon aura */
 }
 
 
-
-
-
+@media (max-width: 768px) {
+  .mint-imax {
+    padding-top: 40px;
+    padding-bottom: 50px;
+    margin-top: 40px;
+    margin-bottom: 50px;
+  }
+}
 
 
   </style>
@@ -1299,11 +1418,23 @@
 
     <!-- HEADLINE -->
     <section class="headline">
-      <h1><span>Your daily market brief, before the world wakes up.</span></h1>
-      <p class="headline-sub">
-        Macro mood, key levels, and my personal watchlist, so I’m ready when the opening bell rings.
-      </p>
-    </section>
+     <h2>Your daily market brief, before the world wakes up.</h2>
+<p>Macro mood, key levels, and my personal watchlist...</p>
+
+<!-- spacer for breathing room -->
+<section class="mint-imax">
+  <a href="/mint-sunday-time.html" class="mint-imax-inner">
+    <img src="images/KstackingSunday.png" alt="Kstacking Mint Sunday Time Banner">
+  </a>
+
+  <div class="mint-sunday-note">
+    🍨 For Subscribers Only • Coming Soon February 2026
+  </div>
+</section>
+
+
+
+
 
     <!-- MAIN LAYOUT -->
     <section class="layout">
