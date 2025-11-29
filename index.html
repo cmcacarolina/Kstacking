@@ -859,18 +859,44 @@
     background: #4dff34;
 }
 
-/* Fix Join Bar Spacing on Mobile */
-@media (max-width: 768px) {
-  .join-bar {
-    margin-top: 90px !important;   /* pushes it down */
-  }
-
-  header {
-    padding-bottom: 20px;
-  }
+.join-bar {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  padding: 10px 18px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px; /* smaller text */
+  margin-top: 20px; /* spacing below the nav */
 }
 
-/* Fix header logo getting cut on mobile */
+.join-bar input {
+  flex: 1;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 8px 12px;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 14px;
+}
+
+.join-bar button {
+  background: #39ff14;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 6px;
+  color: black;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.join-bar button:hover {
+  background: #4dff34;
+}
+
+/* 🔧 Mobile tweaks */
 @media (max-width: 768px) {
   header {
     padding-top: 40px !important;
@@ -878,9 +904,10 @@
   }
 
   .join-bar {
-    margin-top: 120px !important; /* keep join bar clean */
+    margin-top: 24px !important; /* small, clean gap below banner */
   }
 }
+
 
 /* ============== BTC KEY LEVELS CARD (SPY BLUEPRINT STYLE) ============== */
 .asset-card {
