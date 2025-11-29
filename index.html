@@ -801,26 +801,32 @@
     }
 
     @media (max-width: 720px) {
-      .top-nav {
-        flex-direction: column;
-        align-items: flex-start;
-      }
 
-      .nav-links {
-        width: 100%;
-        justify-content: space-between;
-      }
+  /* Keep nav compact */
+  .top-nav {
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 6px 0 !important;
+  }
 
-      .market-strip {
-        flex-direction: column;
-        align-items: flex-start;
-      }
+  .nav-links {
+    width: auto !important;
+    gap: 12px !important;
+  }
 
-      .ticker-bar {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-    }
+  /* Keep other mobile elements stacked */
+  .market-strip {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .ticker-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
 
     .join-bar {
     background: rgba(255,255,255,0.03);
