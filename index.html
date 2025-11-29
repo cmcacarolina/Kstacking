@@ -817,8 +817,11 @@
 
   /* Logo: slightly smaller so it's never cut */
   .top-nav img {
-    height: 28px !important;       /* perfect size for mobile nav */
-    margin-top: 6px !important;    /* pushes it down a little */
+    height: 28px !important;
+    display: block;
+    margin: 0 auto;
+    object-fit: contain;
+    object-position: 50% 55% !important; /* pushes the graphic DOWN 5% */
   }
 
   /* Nav tabs: smaller so the row isn’t packed */
