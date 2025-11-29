@@ -1155,18 +1155,22 @@
 @media (max-width: 768px) {
 
   .kstacking-banner {
-    position: relative !important;   /* no absolute / overlay on mobile   */
+    position: relative !important;
     top: auto !important;
     left: 0 !important;
     right: 0 !important;
-    transform: none !important;      /* kill any desktop transforms       */
+    transform: none !important;
 
     width: 100% !important;
-    max-width: 100% !important;
-    height: 220px;                   /* tweak this number if you want     */
-    margin: 0 auto 16px;
+    max-width: 1200px;
+
+    /* 🔑 FIX THE BIG GAP */
+    height: auto !important;      /* override desktop fixed height */
+    min-height: 0 !important;     /* just in case */
+    
+    margin: 0 auto 12px;
     padding: 0;
-    overflow: hidden;                /* crop edges for IMAX feel          */
+    overflow: hidden;
     z-index: 1;
   }
 
