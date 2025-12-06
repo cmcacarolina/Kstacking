@@ -399,23 +399,73 @@
       return `${w}-${num}`;
     }
 
-    // v2 key so everyone gets prompted at least once
-    let ksUsername = localStorage.getItem("kschat_username_v2");
+  // === RESERVED NAME PROTECTION =====================
 
-    if (!ksUsername) {
-      let chosen = prompt(
-        "Pick a chat nickname (or leave blank for a random one):",
-        ""
-      );
+// Base identity roots YOU control
+const protectedRoots = ["kstacking", "kstackingmod"];
 
-      if (!chosen || !chosen.trim()) {
-        ksUsername = makeRandomName();
-      } else {
-        ksUsername = chosen.trim().slice(0, 18); // keep it short
-      }
+// Extra exact styles you want locked to you only
+const exactReserved = [
+  "Kstacking",
+  "kstacking",
+  "💚Kstacking",
+  "🛡️KstackingMod",
+  "KstackingMod",
+  "kstackingmod"
+];
 
-      localStorage.setItem("kschat_username_v2", ksUsername);
+// Detect impersonation attempts
+function isReservedName(name) {
+  if (!name) return false;
+
+  // Normalize nickname (lowercase + strip emoji/symbols)
+  const normalized = name
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
+
+  // 1) Block anyone using your identity roots in any way
+  const hitsRoot = protectedRoots.some(root => normalized.includes(root));
+
+  // 2) Block exact fancy versions too
+  const hitsExact = exactReserved.includes(name);
+
+  return hitsRoot || hitsExact;
+}
+
+// Owner check (your browser stores a key)
+// You already set this in DevTools:
+// localStorage.setItem("kschat_owner", "true")
+function isOwner() {
+  return localStorage.getItem("kschat_owner") === "true";
+}
+
+// v2 key so everyone gets prompted at least once
+let ksUsername = localStorage.getItem("kschat_username_v2");
+
+if (!ksUsername) {
+  let chosen = prompt(
+    "Pick a chat nickname (or leave blank for a random one):",
+    ""
+  );
+
+  if (!chosen || !chosen.trim()) {
+    ksUsername = makeRandomName();
+  } else {
+    let attempt = chosen.trim().slice(0, 18);
+
+    // 🔥 protection check
+    if (isReservedName(attempt) && !isOwner()) {
+      alert("⚠️ Sorry, that nickname is reserved.");
+      ksUsername = makeRandomName() + "-x";
+    } else {
+      ksUsername = attempt;
     }
+  }
+
+  localStorage.setItem("kschat_username_v2", ksUsername);
+}
+
+
 
     // === Grab chat elements =======================================
     const kToggle   = document.getElementById("kchatToggle");
