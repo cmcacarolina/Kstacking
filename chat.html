@@ -311,6 +311,18 @@
   transform: translateY(-2px);
 }
 
+.grand-slam-results {
+    position: absolute;
+    top: 60%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+@media (max-width: 768px) {
+    .grand-slam-results {
+        top: 50%;
+    }
+}
 
   </style>
 
@@ -322,6 +334,21 @@
   <p class="chat-page-subtitle">
     Respect the pit · No hate · Share SPY levels, lottos, stocks positions & thoughts.
   </p>
+
+  <div class="grand-slam-results">
+    <h2>🏆Grand Slam Standings</h2>
+
+    <ul>
+        <li>🥇 <span class="nick">Waiting for entries...</span></li>
+        <li>🥈 <span class="nick">-</span></li>
+        <li>🥉 <span class="nick">-</span></li>
+        <li>🏅 4th place — W</li>
+        <li>🏅 5th place — W</li>
+    </ul>
+
+    <p class="note">📌 Ws stack toward the 2026 Surprise Champion Gift 🎁</p>
+</div>
+
 
   <a href="index.html" class="kchat-back-btn">← Back to 🤑Kstacking</a>
 
@@ -341,6 +368,8 @@
         <button id="kchatMax" class="kchat-max-btn">⤢</button>
         <button class="kchat-close" id="kchatClose">✕</button>
       </div>
+
+      
 
       <div class="kchat-messages" id="kchatMessages">
         <div class="kchat-message kchat-message-system">
