@@ -1369,12 +1369,62 @@
   <div class="nav-right">
     <div class="nav-badge">
       <span class="nav-dot"></span>
-      Live pre-market • 06:30 am ET
+      Live pre-market • <span id="live-time">Loading...</span>
+
     </div>
     <div class="nav-time">
-      Last updated: 06:30 am ET 12/08/2025
+     Last updated: <span id="last-updated">Loading...</span>
+
     </div>
   </div>
+
+    <script>
+  function updateNYTime() {
+    const now = new Date();
+
+    // FORMAT TIME IN NEW YORK — INCLUDING SECONDS
+    const timeFormatter = new Intl.DateTimeFormat("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: true,
+      timeZone: "America/New_York"
+    });
+
+    // FORMAT DATE IN NEW YORK
+    const dateFormatter = new Intl.DateTimeFormat("en-US", {
+      month: "2-digit",
+      day: "2-digit",
+      year: "numeric",
+      timeZone: "America/New_York"
+    });
+
+    const timeString = timeFormatter.format(now); // Example: "09:29:51 PM"
+    const dateString = dateFormatter.format(now); // Example: "12/09/2025"
+
+    // UPDATE ON PAGE
+    const liveEl = document.getElementById("live-time");
+    const updatedEl = document.getElementById("last-updated");
+
+    if (liveEl) {
+      liveEl.textContent = timeString + " ET";
+    }
+
+    if (updatedEl) {
+      updatedEl.textContent = timeString + " ET " + dateString;
+    }
+  }
+
+  // FIRST RUN
+  updateNYTime();
+
+  // UPDATE EVERY SECOND
+  setInterval(updateNYTime, 1000);
+</script>
+
+
+
+
 </header>
 
 <!-- FULL-WIDTH BANNER -->
