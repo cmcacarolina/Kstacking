@@ -324,6 +324,65 @@
     }
 }
 
+.grand-slam-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 10px;
+}
+
+.grand-slam-list li {
+  margin: 6px 0;
+  font-size: 15px;
+  color: #e5e7eb;
+}
+
+/* Text colors */
+.name {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.week {
+  color: #a855f7; /* purple accent */
+  font-weight: 600;
+}
+
+.ticker {
+  color: #38bdf8; /* blue ticker */
+  font-weight: 700;
+}
+
+.profit {
+  color: #39ff14; /* neon green money */
+  font-weight: 700;
+}
+
+.percent {
+  color: #22c55e;
+  font-weight: 700;
+}
+
+.shares {
+  color: #9ca3af;
+  font-size: 13px;
+}
+
+.muted {
+  color: #6b7280;
+}
+
+.win {
+  color: #39ff14;
+  text-shadow: 0 0 6px rgba(57,255,20,0.35);
+}
+
+/* Footer note */
+.note {
+  margin-top: 10px;
+  font-size: 13px;
+  color: #cbd5f5;
+}
+
   </style>
 
   <link rel="icon" type="image/png" href="/images/favicon64.png">
@@ -338,15 +397,39 @@
   <div class="grand-slam-results">
     <h2>🏆Grand Slam Standings</h2>
 
-    <ul>
-        <li>🥇 <span class="nick">Waiting for entries...</span></li>
-        <li>🥈 <span class="nick">-</span></li>
-        <li>🥉 <span class="nick">-</span></li>
-        <li>🏅 4th place — W</li>
-        <li>🏅 5th place — W</li>
-    </ul>
+   <ul class="grand-slam-list">
+  <li>
+    🥇
+    <span class="name">FinancialFAN</span>
+    <span class="week">W1</span>
+    <span class="ticker">TQQQ</span>
+    <span class="profit">+$104.50</span>
+    <span class="shares">100/shares</span>
+    <span class="percent">+2.11%</span>
+  </li>
 
-    <p class="note">📌 Ws stack toward the 2026 Surprise Champion Gift 🎁</p>
+  <li>🥈
+    <span class="name">Wall Street Black</span>
+    <span class="week">W1</span>
+    <span class="ticker">SPY</span>
+    <span class="profit">+$204.60</span>
+    <span class="shares">60/shares</span>
+    <span class="percent">+0.58%</span>
+  </li>
+  <li>🥉
+    <span class="name">💚Kstacking</span>
+    <span class="week">W1</span>
+    <span class="ticker">SoFi</span>
+    <span class="profit">+$32.40</span>
+    <span class="shares">100/shares</span>
+    <span class="percent">+1.62%</span>
+  </li>
+  <li>🏅 <span class="win">4th place — W</span></li>
+  <li>🏅 <span class="win">5th place — W</span></li>
+</ul>
+
+<p class="note">📌 Ws stack toward the 2026 Surprise Champion Gift 🎁</p>
+
 </div>
 
 
