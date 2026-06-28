@@ -2166,37 +2166,53 @@ Today 6/18/2026 S&P500 SPY Key Levels To Watch 👀 By www.kstacking.com
       </article>
     </section>
 
-    <!-- TICKER BAR -->
-    <footer class="ticker-bar">
-      <div class="ticker-row">
-        <div class="tick">
-          <strong>SPY</strong>
-          <span>746.62</span>
-          <span class="green">+1.02%</span>
-        </div>
-        <div class="tick">
-          <strong>QQQ</strong>
-          <span>734.67</span>
-          <span class="green">+1.68%</span>
-        </div>
-        <div class="tick">
-          <strong>NVDA</strong>
-          <span>•</span>
-          <span class="green">help tech</span>
-        </div>
-        <div class="tick">
-          <strong>META</strong>
-          <span>•</span>
-          <span class="green">Holds</span>
-        </div>
-        <div class="tick">
-          <strong>BTC</strong>
-          <span>↑</span>
-          <span class="red"> 7-month low</span>
-        </div>
-      </div>
-      <div class="ticker-right">
+   <!-- TICKER BAR -->
+<footer class="ticker-bar">
+  <div class="ticker-row" id="footerLiveTickers">
+    <div class="tick">
+      <strong>Loading...</strong>
+    </div>
+  </div>
+
+  <div class="ticker-right">
     © 2026 Kstacking × SpyTrader — All rights reserved.
+  </div>
+</footer>
+
+<script>
+const footerSheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTysv9S3FcqhDYnLqhk3iqmuJAqdoXAXxNlQKMnOHktNaQ2yS6Ro4ONpWZRJhydy8c94N6M4Jt5Xymr/pub?output=csv";
+
+async function loadFooterTickers() {
+  const res = await fetch(footerSheetUrl);
+  const text = await res.text();
+  const rows = text.trim().split("\n").slice(1);
+
+  const box = document.getElementById("footerLiveTickers");
+  box.innerHTML = "";
+
+  rows.forEach(row => {
+    const [ticker, changeRaw] = row.split(",");
+    if (!ticker || !changeRaw) return;
+
+    const cleanChange = changeRaw.replace("%", "").trim();
+    const num = parseFloat(cleanChange);
+    if (isNaN(num)) return;
+
+    const cssClass = num >= 0 ? "green" : "red";
+    const display = num >= 0 ? `+${num.toFixed(2)}%` : `${num.toFixed(2)}%`;
+
+    box.innerHTML += `
+      <div class="tick">
+        <strong>${ticker.trim()}</strong>
+        <span class="${cssClass}">${display}</span>
+      </div>
+    `;
+  });
+}
+
+loadFooterTickers();
+setInterval(loadFooterTickers, 60000);
+</script>
 </div>
 
     </footer>
