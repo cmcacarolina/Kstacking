@@ -1545,30 +1545,44 @@ a:hover {
 
 
     <div class="top-tickers-bar">
-  <div class="mag7-section">
+  <div class="mag7-section" id="liveTickers">
     <span class="label">Tickers</span>
-    <span class="ticker">NVDA <span class="up">+1.19%</span></span>
-    <span class="ticker">MU <span class="up">+4.53%</span></span>
-    <span class="ticker">TSLA <span class="up">+0.53%</span></span>
-    <span class="ticker">AAPL <span class="up">+0.56%</span></span>
-    <span class="ticker">MSFT <span class="up">+1.00%</span></span>
-    <span class="ticker">SNDK <span class="up">+4.04%</span></span>
-    <span class="ticker">GOOGL <span class="up">+0.25%</span></span>
-    <span class="ticker">SPCX <span class="down">-0.47%</span></span>
-
-  </div>
-
-  <div class="mentions-section">
-    <span class="label">Most Mentioned Today</span>
-    <span class="ticker">SPCX <span class="down">↓</span></span>
-    <span class="ticker">NVDA <span class="up">↑</span></span>
-    <span class="ticker">DELL <span class="up">↑</span></span>
-    <span class="ticker">SNDK <span class="up">↑</span></span>
-    <span class="ticker">MU <span class="up">↑</span></span>
-    <span class="ticker">GME <span class="up">↑</span></span>
-    <span class="ticker">CRSR <span class="up">↑</span></span>
+    <span class="ticker">Loading...</span>
   </div>
 </div>
+
+<script>
+const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTysv9S3FcqhDYnLqhk3iqmuJAqdoXAXxNlQKMnOHktNaQ2yS6Ro4ONpWZRJhydy8c94N6M4Jt5Xymr/pub?output=csv";
+
+async function loadLiveTickers() {
+  const res = await fetch(sheetUrl);
+  const text = await res.text();
+  const rows = text.trim().split("\n").slice(1);
+
+  const box = document.getElementById("liveTickers");
+  box.innerHTML = '<span class="label">Tickers</span>';
+
+  rows.forEach(row => {
+    const [ticker, changeRaw] = row.split(",");
+    const cleanChange = changeRaw.replace("%", "").trim();
+    const num = parseFloat(cleanChange);
+
+    if (!ticker || isNaN(num)) return;
+
+    const cssClass = num >= 0 ? "up" : "down";
+    const display = num >= 0 ? `+${num.toFixed(2)}%` : `${num.toFixed(2)}%`;
+
+    box.innerHTML += `
+      <span class="ticker">${ticker.trim()} <span class="${cssClass}">${display}</span></span>
+    `;
+  });
+}
+
+loadLiveTickers();
+setInterval(loadLiveTickers, 60000);
+</script>
+
+ 
 
    <!-- MARKET STRIP -->
 <section class="market-strip">
