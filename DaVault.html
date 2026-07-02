@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DaVault | Management Database</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+  background:#030303;
+  color:white;
+  font-family:'Montserrat',sans-serif;
+}
+
+nav{
+  background:#050505;
+  border-bottom:1px solid #202020;
+  padding:18px 60px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  position:sticky;
+  top:0;
+  z-index:100;
+}
+
+.logo{
+  font-size:34px;
+  font-weight:900;
+}
+
+.logo span{color:#57ff00}
+
+.menu{
+  display:flex;
+  gap:30px;
+}
+
+.menu a{
+  color:#ccc;
+  text-decoration:none;
+  font-weight:700;
+}
+
+.menu a:hover{color:#57ff00}
+
+.hero-banner{
+  max-width:1600px;
+  margin:40px auto 30px;
+  padding:0 20px;
+}
+
+.hero-banner img{
+  width:100%;
+  border-radius:18px;
+  border:2px solid #57ff00;
+  box-shadow:0 0 35px rgba(87,255,0,.25);
+}
+
+.report-hero{
+  max-width:1300px;
+  margin:50px auto;
+  padding:0 20px;
+}
+
+.report-box{
+  background:
+  radial-gradient(circle at top left,rgba(87,255,0,.18),transparent 35%),
+  linear-gradient(135deg,#121212,#050505);
+  border:1px solid rgba(87,255,0,.35);
+  border-radius:28px;
+  padding:50px;
+  box-shadow:0 0 55px rgba(87,255,0,.12);
+}
+
+.label{
+  color:#57ff00;
+  font-size:13px;
+  font-weight:900;
+  letter-spacing:4px;
+  margin-bottom:15px;
+}
+
+.report-box h1{
+  font-size:clamp(38px,5vw,70px);
+  line-height:1;
+  text-transform:uppercase;
+  max-width:1000px;
+  margin-bottom:20px;
+}
+
+.report-box p{
+  color:#c7c7c7;
+  font-size:18px;
+  line-height:1.6;
+  max-width:850px;
+  margin-bottom:30px;
+}
+
+.report-form{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:14px;
+}
+
+.report-form input{
+  padding:22px 26px;
+  border-radius:16px;
+  border:1px solid #333;
+  background:#0b0b0b;
+  color:white;
+  font-size:18px;
+  outline:none;
+}
+
+.report-form input:focus{
+  border-color:#57ff00;
+  box-shadow:0 0 22px rgba(87,255,0,.25);
+}
+
+.report-form button,
+.print-btn{
+  background:#57ff00;
+  color:#050505;
+  border:none;
+  border-radius:16px;
+  padding:0 30px;
+  font-weight:900;
+  font-size:16px;
+  cursor:pointer;
+}
+
+.report-form button:hover,
+.print-btn:hover{
+  box-shadow:0 0 28px rgba(87,255,0,.45);
+}
+
+.status{
+  color:#aaa;
+  margin-top:18px;
+  font-weight:700;
+}
+
+.result-section{
+  max-width:1300px;
+  margin:40px auto 80px;
+  padding:0 20px;
+  display:none;
+}
+
+.result-card{
+  background:linear-gradient(145deg,#121212,#060606);
+  border:1px solid rgba(87,255,0,.35);
+  border-radius:28px;
+  overflow:hidden;
+  box-shadow:0 0 35px rgba(87,255,0,.12);
+}
+
+.result-header{
+  padding:30px;
+  border-bottom:1px solid #242424;
+  display:flex;
+  justify-content:space-between;
+  gap:20px;
+  flex-wrap:wrap;
+}
+
+.result-header h2{
+  font-size:38px;
+}
+
+.result-header span{
+  color:#57ff00;
+}
+
+.print-btn{
+  padding:16px 24px;
+}
+
+.metrics{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+}
+
+.metric{
+  padding:26px;
+  border-right:1px solid #1f1f1f;
+  border-bottom:1px solid #1f1f1f;
+}
+
+.metric small{
+  display:block;
+  color:#777;
+  font-weight:800;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  margin-bottom:10px;
+}
+
+.metric strong{
+  font-size:25px;
+  color:white;
+}
+
+.green{color:#57ff00!important}
+.red{color:#ff4141!important}
+
+.database{
+  max-width:1450px;
+  margin:auto;
+  padding:40px 20px 90px;
+}
+
+.section-title{
+  font-size:clamp(42px,6vw,86px);
+  line-height:.95;
+  text-transform:uppercase;
+  margin-bottom:25px;
+}
+
+.section-title span{color:#57ff00}
+
+.table-wrap{
+  overflow-x:auto;
+  background:#080808;
+  border:1px solid #252525;
+  border-radius:24px;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:900px;
+}
+
+th,td{
+  padding:18px 22px;
+  border-bottom:1px solid #1f1f1f;
+  text-align:left;
+}
+
+th{
+  color:#777;
+  font-size:12px;
+  letter-spacing:2px;
+  text-transform:uppercase;
+}
+
+td{
+  font-weight:700;
+}
+
+footer{
+  background:#020202;
+  border-top:1px solid #202020;
+  padding:50px;
+  text-align:center;
+  color:#888;
+}
+
+footer strong{color:#57ff00}
+
+@media print{
+  nav,.hero-banner,.report-hero,.database,footer{
+    display:none;
+  }
+
+  body{
+    background:white;
+    color:black;
+  }
+
+  .result-section{
+    display:block!important;
+    margin:0;
+    padding:0;
+  }
+
+  .result-card{
+    box-shadow:none;
+    border:2px solid #000;
+    color:black;
+  }
+
+  .result-header,
+  .metric{
+    border-color:#000;
+  }
+
+  .metric strong,
+  .result-header h2{
+    color:black!important;
+  }
+
+  .green,.red{
+    color:black!important;
+  }
+
+  .print-btn{
+    display:none;
+  }
+}
+
+@media(max-width:850px){
+  nav{
+    padding:18px 22px;
+    flex-direction:column;
+    gap:15px;
+  }
+
+  .menu{
+    flex-wrap:wrap;
+    justify-content:center;
+  }
+
+  .report-form{
+    grid-template-columns:1fr;
+  }
+
+  .report-form button{
+    padding:20px;
+  }
+
+  .report-box{
+    padding:32px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<nav>
+  <div class="logo"><span>Da</span>Vault</div>
+
+  <div class="menu">
+    <a href="#">Database</a>
+    <a href="#">Reports</a>
+    <a href="#">Compare</a>
+    <a href="#">Rankings</a>
+    <a href="#">Login</a>
+  </div>
+</nav>
+
+<section class="hero-banner">
+  <img src="images/DaVaultbanner.png" alt="DaVault Banner">
+</section>
+
+<section class="report-hero">
+  <div class="report-box">
+    <p class="label">MANAGEMENT DATABASE</p>
+
+    <h1>Search Any Company. Generate A Professional Report.</h1>
+
+    <p>
+      DaVault tracks management decisions across public companies:
+      buybacks, debt, shares outstanding, net income, growth, and dilution.
+    </p>
+
+    <div class="report-form">
+      <input id="companySearch" type="text" placeholder="Enter ticker or company... AMAT, LRCX">
+      <button onclick="searchCompany()">Generate Report →</button>
+    </div>
+
+    <div id="status" class="status" style="display:none;"></div>
+  </div>
+</section>
+
+<section id="resultSection" class="result-section">
+  <div class="result-card">
+    <div class="result-header">
+      <div>
+        <p class="label">DaVault Management Report</p>
+        <h2><span id="resultName">Company</span> <span id="resultTicker"></span></h2>
+      </div>
+
+      <button class="print-btn" onclick="window.print()">Print / Save PDF</button>
+    </div>
+
+    <div class="metrics">
+      <div class="metric">
+        <small>Price</small>
+        <strong id="price">-</strong>
+      </div>
+
+      <div class="metric">
+        <small>Market Cap</small>
+        <strong id="marketCap">-</strong>
+      </div>
+
+      <div class="metric">
+        <small>Shares Outstanding</small>
+        <strong id="shares">-</strong>
+      </div>
+
+      <div class="metric">
+        <small>Shares Outstanding 1Y Change</small>
+        <strong id="sharesChange">-</strong>
+      </div>
+
+      <div class="metric">
+        <small>Buyback Ammo</small>
+        <strong id="buyback">-</strong>
+      </div>
+
+      <div class="metric">
+        <small>Net Income TTM</small>
+        <strong id="netIncome">-</strong>
+      </div>
+
+      <div class="metric">
+        <small>Net Income Growth 1Y</small>
+        <strong id="incomeGrowth">-</strong>
+      </div>
+
+      <div class="metric">
+        <small>Debt</small>
+        <strong id="debt">-</strong>
+      </div>
+
+      <div class="metric">
+        <small>Debt 1Y Change</small>
+        <strong id="debtChange">-</strong>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<footer>
+  © 2026 <strong>DaVault</strong> • Management Database • Powered by Kstacking
+</footer>
+
+<script>
+const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQjtM5g6QId6Itpqofl1PCeH0fKTEmSAOjpIDimQZdaZz3Vv3k6QNTLVkYuXXxZQ80-Zgv4nTHWL1v_/pub?output=csv";
+
+let companies = [];
+
+function normalize(text){
+  return String(text || "").toLowerCase().replace(/[^a-z0-9]/g,"");
+}
+
+function getValue(row, names){
+  for(const name of names){
+    if(row[name] !== undefined && row[name] !== ""){
+      return row[name];
+    }
+  }
+  return "-";
+}
+
+function colorValue(id, value, type){
+  const el = document.getElementById(id);
+  el.classList.remove("green","red");
+
+  const text = String(value);
+
+  if(type === "sharesChange"){
+    if(text.includes("-")) el.classList.add("green");
+    else if(text.includes("+")) el.classList.add("red");
+  }
+
+  if(type === "debtChange"){
+    if(text.includes("-")) el.classList.add("green");
+    else if(text.includes("+")) el.classList.add("red");
+  }
+
+  if(type === "incomeGrowth"){
+    if(text.includes("+")) el.classList.add("green");
+    else if(text.includes("-")) el.classList.add("red");
+  }
+
+  if(type === "buyback"){
+    if(text.toLowerCase().includes("none") || text === "-") el.classList.add("red");
+    else el.classList.add("green");
+  }
+
+  if(type === "debt"){
+    if(text.includes("-")) el.classList.add("red");
+    else if(text.includes("$")) el.classList.add("green");
+  }
+}
+
+Papa.parse(sheetURL,{
+  download:true,
+  skipEmptyLines:true,
+  complete:function(results){
+
+    const rawRows = results.data;
+
+    const headerIndex = rawRows.findIndex(row =>
+      row.includes("Company") && row.includes("Ticker")
+    );
+
+    if(headerIndex === -1){
+      document.getElementById("status").innerText =
+        "Headers not found. Make sure your sheet has Company and Ticker columns.";
+      console.log(rawRows);
+      return;
+    }
+
+    const headers = rawRows[headerIndex].map(h => String(h).trim());
+
+    companies = rawRows.slice(headerIndex + 1).map(row => {
+      let obj = {};
+      headers.forEach((header, i) => {
+        obj[header] = row[i] ? String(row[i]).trim() : "";
+      });
+      return obj;
+    }).filter(row => row.Company && row.Ticker);
+
+    document.getElementById("status").innerText =
+      "Database loaded: " + companies.length + " companies.";
+
+    buildTable();
+    console.log("DaVault database loaded:", companies);
+  }
+});
+
+function buildTable(){
+  const tbody = document.getElementById("databaseTable");
+  tbody.innerHTML = "";
+
+  companies.forEach(row => {
+    const tr = document.createElement("tr");
+
+    tr.innerHTML = `
+      <td>${getValue(row,["Company"])}</td>
+      <td class="green">${getValue(row,["Ticker"])}</td>
+      <td>${getValue(row,["Price"])}</td>
+      <td>${getValue(row,["Market Cap"])}</td>
+      <td>${getValue(row,["Shares Outstanding"])}</td>
+      <td>${getValue(row,["Shares Outstanding 1Y%chg"])}</td>
+      <td class="green">${getValue(row,["Buyback Ammo $"])}</td>
+      <td>${getValue(row,["$ Net Income TTM","Net Income TTM"])}</td>
+      <td>${getValue(row,["% Net Income Growth 1Y","Net Income Growth 1Y"])}</td>
+      <td>${getValue(row,["Debt"])}</td>
+      <td>${getValue(row,["Debt 1Y%chg"])}</td>
+    `;
+
+    tbody.appendChild(tr);
+  });
+}
+
+function searchCompany(){
+  const input = normalize(document.getElementById("companySearch").value);
+
+  const result = companies.find(row => {
+    const company = normalize(getValue(row,["Company"]));
+    const ticker = normalize(getValue(row,["Ticker"]));
+    return ticker === input || company === input;
+  });
+
+  if(!result){
+    alert("Company not found in DaVault.");
+    return;
+  }
+
+  document.getElementById("resultName").innerText = getValue(result,["Company"]);
+  document.getElementById("resultTicker").innerText = "(" + getValue(result,["Ticker"]) + ")";
+
+  document.getElementById("price").innerText = getValue(result,["Price"]);
+  document.getElementById("marketCap").innerText =
+  getValue(result, ["Market Cap", "MrktCap", "MarketCap"]);
+  document.getElementById("shares").innerText = getValue(result,["Shares Outstanding"]);
+  document.getElementById("sharesChange").innerText = getValue(result,["Shares Outstanding 1Y%chg"]);
+  document.getElementById("buyback").innerText = getValue(result,["Buyback Ammo $"]);
+  document.getElementById("netIncome").innerText = getValue(result,["$ Net Income TTM","Net Income TTM"]);
+  document.getElementById("incomeGrowth").innerText = getValue(result,["% Net Income Growth 1Y","Net Income Growth 1Y"]);
+  document.getElementById("debt").innerText = getValue(result,["Debt"]);
+  document.getElementById("debtChange").innerText = getValue(result,["Debt 1Y%chg"]);
+
+  colorValue("sharesChange", document.getElementById("sharesChange").innerText, "sharesChange");
+  colorValue("buyback", document.getElementById("buyback").innerText, "buyback");
+  colorValue("incomeGrowth", document.getElementById("incomeGrowth").innerText, "incomeGrowth");
+  colorValue("debt", document.getElementById("debt").innerText, "debt");
+  colorValue("debtChange", document.getElementById("debtChange").innerText, "debtChange");
+
+  document.getElementById("resultSection").style.display = "block";
+  document.getElementById("resultSection").scrollIntoView({behavior:"smooth"});
+}
+
+document.getElementById("companySearch").addEventListener("keydown",function(e){
+  if(e.key === "Enter") searchCompany();
+});
+</script>
+
+</body>
+</html>
