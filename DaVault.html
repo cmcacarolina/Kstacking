@@ -17,6 +17,31 @@ body{
   font-family:'Montserrat',sans-serif;
 }
 
+.back-btn{
+    color:#57ff00;
+    text-decoration:none;
+    font-weight:800;
+    border:1px solid #57ff00;
+    padding:10px 18px;
+    border-radius:12px;
+    transition:.3s;
+}
+
+.back-btn:hover{
+    background:#57ff00;
+    color:#050505;
+    box-shadow:0 0 20px rgba(87,255,0,.35);
+}
+
+@media(max-width:850px){
+  .back-btn{
+    width:100%;
+    text-align:center;
+    padding:12px 18px;
+    font-size:14px;
+  }
+}
+
 nav{
   background:#050505;
   border-bottom:1px solid #202020;
@@ -28,6 +53,8 @@ nav{
   top:0;
   z-index:100;
 }
+
+
 
 .logo{
   font-size:34px;
@@ -336,7 +363,8 @@ footer strong{color:#57ff00}
 <body>
 
 <nav>
-  <div class="logo"><span>Da</span>Vault</div>
+  <a href="index.html" class="back-btn">← Back</a>
+  
 
   <div class="menu">
     <a href="#">Database</a>
