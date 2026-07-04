@@ -1193,6 +1193,43 @@ a:hover {
   font-weight: 600;
 }
 
+/* ============== BTC LEVELS + CHART LAYOUT ============== */
+.btc-layout {
+  display: grid;
+  grid-template-columns: 420px 1fr;
+  gap: 24px;
+  align-items: start;
+  margin-top: 16px;
+}
+
+.btc-live-chart {
+  width: 100%;
+  min-width: 0;
+  margin-top: -80px;
+}
+
+.btc-chart-frame {
+  width: 100%;
+  height: 700px;
+  border: 0;
+  border-radius: 14px;
+  display: block;
+}
+
+@media (max-width: 950px) {
+  .btc-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .btc-chart-frame {
+    height: 500px;
+  }
+}
+
+.btc-card {
+  grid-column: 1 / -1;
+}
+
 .asset-footer {
   margin-top: 14px;
   padding-top: 10px;
@@ -2076,6 +2113,7 @@ Week 7/6/2026 to 7/10/2026: S&P500 SPY Key Levels To Watch 👀 By www.kstacking
   </article>
   <!-- ================= BTC – KEY LEVELS TO WATCH ================= -->
 <section class="asset-card btc-card">
+
   <header class="asset-header">
     <div class="asset-tag">Bitcoin Key Levels to Watch</div>
     <div class="asset-title">Bitcoin – Flush Zones & Reclaim Levels</div>
@@ -2084,7 +2122,8 @@ Week 7/6/2026 to 7/10/2026: S&P500 SPY Key Levels To Watch 👀 By www.kstacking
   <div class="asset-meta">
     BTC: <span class="asset-price">$61,040</span>
     <span class="asset-change">−2.58% today</span>
-    · 1Y Low ~ <span class="soft">$60,279</span> · 1Y High ~ <span class="soft">$126,000</span>
+    · 1Y Low ~ <span class="soft">$60,279</span>
+    · 1Y High ~ <span class="soft">$126,000</span>
   </div>
 
   <div class="asset-chips">
@@ -2093,85 +2132,160 @@ Week 7/6/2026 to 7/10/2026: S&P500 SPY Key Levels To Watch 👀 By www.kstacking
     <span class="chip chip-soft">Whales accumulation zone</span>
   </div>
 
-  <div class="levels-columns">
-    <!-- Downside -->
-    <div class="levels-col">
-      <h3 class="levels-heading bearish">Downside Flush Zones</h3>
+  <!-- BTC LAYOUT -->
+  <div class="btc-layout">
 
-      <div class="level-row">
-        <div class="level-label">Local support</div>
-        <div class="level-price">$60,000</div>
-        <div class="level-note">Today’s intraday low area · first bounce zone.</div>
-      </div>
+    <!-- LEFT -->
+    <div class="btc-levels">
 
-      <div class="level-row">
-        <div class="level-label">Key support</div>
-        <div class="level-price">$65,200</div>
-        <div class="level-note">
-          Multi-month base from May/Oct · your first major “buy-the-fear” alert.
+      <div class="levels-columns">
+
+        <!-- Downside -->
+        <div class="levels-col">
+
+          <h3 class="levels-heading bearish">Downside Flush Zones</h3>
+
+          <div class="level-row">
+            <div class="level-label">Local support</div>
+            <div class="level-price">$60,000</div>
+            <div class="level-note">
+              Today's intraday low area · first bounce zone.
+            </div>
+          </div>
+
+          <div class="level-row">
+            <div class="level-label">Key support</div>
+            <div class="level-price">$65,200</div>
+            <div class="level-note">
+              Multi-month base from May/Oct · your first major "buy-the-fear" alert.
+            </div>
+          </div>
+
+          <div class="level-row">
+            <div class="level-label">Deep flush</div>
+            <div class="level-price">$60,500</div>
+            <div class="level-note">
+              Liquidation pocket · if hit with heavy volume, watch for fast V-reversal.
+            </div>
+          </div>
+
+          <div class="level-row">
+            <div class="level-label">Panic floor</div>
+            <div class="level-price">$54,500</div>
+            <div class="level-note">
+              Full capitulation zone · RSI likely sub-25 · next cycle leg often starts here.
+            </div>
+          </div>
+
+          <footer class="asset-footer">
+            <div class="footer-title">Kstacking BTC Plan</div>
+            <p class="footer-text">
+              Watch how buyers react between <strong>$60K</strong> and
+              <strong>$54.5K</strong>. A sharp selloff followed by higher
+              lows, increasing volume and a reclaim of
+              <strong>$65.2K</strong> often signals institutional
+              accumulation instead of continued liquidation.
+            </p>
+            <p class="footer-signoff">
+              — Live levels curated by
+              <span class="brand">Kstacking.com</span>
+            </p>
+          </footer>
+
         </div>
+
+        <!-- Upside -->
+        <div class="levels-col">
+
+          <footer class="asset-footer">
+            <div class="footer-title">Bull Confirmation Plan</div>
+            <p class="footer-text">
+              Bulls regain momentum above
+              <strong>$69.1K</strong>. A clean break through
+              <strong>$72.5K</strong> confirms buyers returning,
+              <strong>$76K</strong> shifts market sentiment, and sustained
+              strength above <strong>$84K</strong> opens the door toward
+              previous cycle highs.
+            </p>
+           
+          </footer>
+
+          <h3 class="levels-heading bullish">Upside Reclaim Levels</h3>
+
+          <div class="level-row">
+            <div class="level-label">First reclaim</div>
+            <div class="level-price">$69,100</div>
+            <div class="level-note">
+              Flip back above here = short-term stabilization after the flush.
+            </div>
+          </div>
+
+          <div class="level-row">
+            <div class="level-label">Volume confirmation</div>
+            <div class="level-price">$72,500</div>
+            <div class="level-note">
+              Buyers need expanding volume to keep the recovery intact.
+            </div>
+          </div>
+
+          <div class="level-row">
+            <div class="level-label">Momentum gate</div>
+            <div class="level-price">$76,000</div>
+            <div class="level-note">
+              If BTC holds above this zone with volume, selling pressure starts to fade.
+            </div>
+          </div>
+
+          <div class="level-row">
+            <div class="level-label">Trend flip</div>
+            <div class="level-price">$84,000</div>
+            <div class="level-note">
+              Above prior local high · opens path back toward the upper range.
+            </div>
+          </div>
+
+        </div>
+
       </div>
 
-      <div class="level-row">
-        <div class="level-label">Deep flush</div>
-        <div class="level-price">$60,500</div>
-        <div class="level-note">
-          Liquidation pocket · if hit with heavy volume, watch for fast V-reversal.
-        </div>
-      </div>
-
-      <div class="level-row">
-        <div class="level-label">Panic floor</div>
-        <div class="level-price">$54,500</div>
-        <div class="level-note">
-          Full capitulation zone · RSI likely sub-25 · next cycle leg often starts here.
-        </div>
-      </div>
     </div>
 
-    <!-- Upside -->
-    <div class="levels-col">
-      <h3 class="levels-heading bullish">Upside Reclaim Levels</h3>
+    <!-- RIGHT -->
+    <div class="btc-live-chart">
 
-      <div class="level-row">
-        <div class="level-label">First reclaim</div>
-        <div class="level-price">$69,100</div>
-        <div class="level-note">
-          Flip back above here = short-term stabilization after the flush.
-        </div>
-      </div>
+      <iframe
+        class="btc-chart-frame"
+        src="https://www.tradingview.com/widgetembed/?symbol=CRYPTO%3ABTCUSD&interval=D&theme=dark&style=1"
+        frameborder="0"
+        allowtransparency="true"
+        scrolling="no">
+      </iframe>
 
-      <div class="level-row">
-        <div class="level-label">Momentum gate</div>
-        <div class="level-price">$76,000</div>
-        <div class="level-note">
-          If BTC holds above this zone with volume, selling pressure starts to fade.
-        </div>
-      </div>
-
-      <div class="level-row">
-        <div class="level-label">Trend flip</div>
-        <div class="level-price">$84,000</div>
-        <div class="level-note">
-          Above prior local high · opens path back toward the upper range.
-        </div>
-      </div>
-
-    
-      </div>
     </div>
+
   </div>
 
-  <footer class="asset-footer">
-    <div class="footer-title">Kstacking BTC Plan</div>
-    <p class="footer-text">
-      Track how price behaves between <strong>$86K → $83.7K → $83.34K</strong>.
-      Look for oversold bounces and first green histogram candle for entries.
-      Trend strength returns only if BTC reclaims and holds above
-      <strong>$90.8K</strong> and then <strong>$93K</strong>.
-    </p>
-    <p class="footer-signoff">— Live levels curated by <span class="brand">Kstacking.com</span></p>
-  </footer>
+</section>
+
+          
+
+        </div>
+
+      </div>
+
+    </div>
+
+    
+
+    </div>
+
+  </div>
+
+   
+
+</section>
+
+  
 </section>
 
 
