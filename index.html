@@ -588,12 +588,34 @@ a:hover {
 
 /* Mobile */
 
-/* Hide on phones */
-@media (max-width:768px){
-    .desktop-video{
+@media(max-width:768px){
+
+    .imax-header{
+        flex-direction:column;
+        gap:14px;
+        text-align:center;
+    }
+
+    .imax-info{
+        text-align:center;
+    }
+
+    .imax-poster{
+        width:90px;
+        height:120px;
+    }
+
+    .imax-header h2{
+        font-size:24px;
+    }
+
+    /* 👇 Hide the entire player on phones */
+    .imax-player{
         display:none;
     }
+
 }
+
 
     /* KEY LEVELS & WATCHLIST ----------------------------------------------- */
 
