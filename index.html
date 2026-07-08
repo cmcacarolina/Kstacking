@@ -506,6 +506,120 @@ a:hover {
       color: #f5d0fe;
     }
 
+    /* ================= KSTACKING IMAX ================= */
+
+.ks-imax{
+    width:100%;
+    max-width:1700px;
+    margin:8px auto 15px;
+}
+
+/* Header */
+
+.imax-header{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:16px;
+    margin-bottom:20px;
+}
+
+.imax-info{
+    text-align:left;
+}
+
+.imax-poster{
+    width:50px;
+    height:80px;
+    object-fit:cover;
+    border-radius:12px;
+    border:2px solid rgba(57,255,20,.35);
+    box-shadow:
+        0 8px 20px rgba(0,0,0,.35),
+        0 0 12px rgba(57,255,20,.12);
+}
+
+.imax-poster:hover{
+    transform:scale(1.04);
+}
+
+.imax-tag{
+    display:inline-block;
+    padding:6px 16px;
+    border-radius:999px;
+    background:#0f172a;
+    border:1px solid #39ff14;
+    color:#39ff14;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:.15em;
+}
+
+.imax-header h2{
+    margin-top:12px;
+    font-size:38px;
+    color:#fff;
+}
+
+.imax-header p{
+    margin-top:8px;
+    color:#94a3b8;
+    font-size:15px;
+}
+
+/* Video */
+
+.imax-player{
+    width:98%;
+    max-width:1700px;
+    margin:0 auto;
+    border-radius:20px;
+    overflow:hidden;
+    box-shadow:
+        0 20px 60px rgba(0,0,0,.55);
+}
+
+.imax-player iframe{
+    width:100%;
+    aspect-ratio:21/9;
+    border:0;
+    display:block;
+}
+
+/* Mobile */
+
+@media(max-width:768px){
+
+    .imax-header{
+        flex-direction:column;
+        gap:14px;
+        text-align:center;
+    }
+
+    .imax-info{
+        text-align:center;
+    }
+
+    .imax-poster{
+        width:90px;
+        height:120px;
+    }
+
+    .imax-header h2{
+        font-size:24px;
+    }
+
+    .imax-player{
+        width:100%;
+        border-radius:16px;
+    }
+
+    .imax-player iframe{
+        aspect-ratio:16/9;
+    }
+
+}
+
     /* KEY LEVELS & WATCHLIST ----------------------------------------------- */
 
     .levels-grid {
@@ -1700,9 +1814,45 @@ setInterval(loadLiveTickers, 5000);
 
     </section>
 
+    <!-- ================= KSTACKING IMAX ================= -->
+
+<section class="ks-imax">
+
+  <div class="imax-header">
+
+    <span class="imax-tag">🎬 NOW PLAYING</span>
+
+    <img
+        src="images/Thehulk.jpg"
+        alt="Now Playing"
+        class="imax-poster">
+
+    <div class="imax-info">
+
+        <h2>KStacking IMAX Theater 🍿</h2>
+
+        <p>Today's featured market video.</p>
+
+    </div>
+
+</div>
+
+  <div class="imax-player">
+
+    <iframe
+      src="https://www.youtube.com/embed/NRTmocsdb7o?autoplay=1&mute=1&rel=0&modestbranding=1"
+      title="Kstacking Featured Video"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      allowfullscreen>
+    </iframe>
+
+  </div>
+
+</section>
+
     <!-- HEADLINE -->
     <section class="headline" id="davault">
-     <h2>Your daily market brief, before the world wakes up.</h2>
+     <h2></h2>
 <p></p>
 
 <a href="DaVault.html" target="_blank">
