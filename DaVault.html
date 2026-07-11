@@ -432,6 +432,11 @@ footer strong{color:#57ff00}
       </div>
 
       <div class="metric">
+        <small>Free Float Shares</small>
+        <strong id="freeFloat">-</strong>
+      </div>
+
+      <div class="metric">
         <small>Buyback Ammo</small>
         <strong id="buyback">-</strong>
       </div>
@@ -598,6 +603,12 @@ function searchCompany(){
   getValue(result, ["Market Cap", "MrktCap", "MarketCap"]);
   document.getElementById("shares").innerText = getValue(result,["Shares Outstanding"]);
   document.getElementById("sharesChange").innerText = getValue(result,["Shares Outstanding 1Y%chg"]);
+  document.getElementById("freeFloat").innerText =
+getValue(result,[
+  "Free Float Shares",
+  "Free Float",
+  "Float Shares"
+]);
   document.getElementById("buyback").innerText = getValue(result,["Buyback Ammo $"]);
   document.getElementById("netIncome").innerText = getValue(result,["$ Net Income TTM","Net Income TTM"]);
   document.getElementById("incomeGrowth").innerText = getValue(result,["% Net Income Growth 1Y","Net Income Growth 1Y"]);
