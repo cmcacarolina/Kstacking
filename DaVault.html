@@ -235,6 +235,7 @@ nav{
 }
 
 .green{color:#57ff00!important}
+.aqua{color:#00e5ff!important}
 .red{color:#ff4141!important}
 
 .database{
@@ -324,7 +325,7 @@ footer strong{color:#57ff00}
     color:black!important;
   }
 
-  .green,.red{
+  .green,.aqua,.red{
     color:black!important;
   }
 
@@ -485,109 +486,226 @@ function getValue(row, names){
       return row[name];
     }
   }
+
   return "-";
+}
+
+/*
+Converts:
+1.07 Billion  -> 1,070,000,000
+144.57 Million -> 144,570,000
+24.2B -> 24,200,000,000
+*/
+function parseShareValue(value){
+  const text = String(value || "").toLowerCase().trim();
+
+  if(text === "" || text === "-" || text.includes("none")){
+    return NaN;
+  }
+
+  const number = parseFloat(text.replace(/,/g,""));
+
+  if(Number.isNaN(number)){
+    return NaN;
+  }
+
+  if(text.includes("trillion") || text.includes(" t")){
+    return number * 1e12;
+  }
+
+  if(text.includes("billion") || text.includes(" b")){
+    return number * 1e9;
+  }
+
+  if(text.includes("million") || text.includes(" m")){
+    return number * 1e6;
+  }
+
+  if(text.includes("thousand") || text.includes(" k")){
+    return number * 1e3;
+  }
+
+  return number;
 }
 
 function colorValue(id, value, type){
   const el = document.getElementById(id);
-  el.classList.remove("green","red");
+
+  if(!el){
+    return;
+  }
+
+  el.classList.remove("green","red","aqua");
 
   const text = String(value);
 
   if(type === "sharesChange"){
-    if(text.includes("-")) el.classList.add("green");
-    else if(text.includes("+")) el.classList.add("red");
+    if(text.includes("-")){
+      el.classList.add("green");
+    }else if(text.includes("+")){
+      el.classList.add("red");
+    }
   }
 
   if(type === "debtChange"){
-    if(text.includes("-")) el.classList.add("green");
-    else if(text.includes("+")) el.classList.add("red");
+    if(text.includes("-")){
+      el.classList.add("green");
+    }else if(text.includes("+")){
+      el.classList.add("red");
+    }
   }
 
   if(type === "incomeGrowth"){
-    if(text.includes("+")) el.classList.add("green");
-    else if(text.includes("-")) el.classList.add("red");
+    if(text.includes("+")){
+      el.classList.add("green");
+    }else if(text.includes("-")){
+      el.classList.add("red");
+    }
   }
 
   if(type === "buyback"){
-    if(text.toLowerCase().includes("none") || text === "-") el.classList.add("red");
-    else el.classList.add("green");
+    if(text.toLowerCase().includes("none") || text === "-"){
+      el.classList.add("red");
+    }else{
+      el.classList.add("green");
+    }
   }
 
   if(type === "debt"){
-    if(text.includes("-")) el.classList.add("red");
-    else if(text.includes("$")) el.classList.add("green");
+    if(text.includes("-")){
+      el.classList.add("red");
+    }else if(text.includes("$")){
+      el.classList.add("green");
+    }
+  }
+
+  if(type === "freeFloat"){
+    const outstandingText =
+      document.getElementById("shares").innerText;
+
+    const outstanding =
+      parseShareValue(outstandingText);
+
+    const freeFloat =
+      parseShareValue(text);
+
+    if(
+      Number.isNaN(outstanding) ||
+      Number.isNaN(freeFloat) ||
+      outstanding <= 0
+    ){
+      return;
+    }
+
+    const floatPercentage =
+      (freeFloat / outstanding) * 100;
+
+    /*
+      90% or higher = Red
+      70%–89.99%    = White
+      40%–69.99%    = Aqua
+      Below 40%     = Neon Green
+    */
+
+    if(floatPercentage >= 90){
+      el.classList.add("red");
+    }else if(floatPercentage >= 70){
+      // No class: stays white
+    }else if(floatPercentage >= 40){
+      el.classList.add("aqua");
+    }else{
+      el.classList.add("green");
+    }
+
+    console.log(
+      "Free Float:",
+      floatPercentage.toFixed(2) + "%"
+    );
   }
 }
 
 Papa.parse(sheetURL,{
   download:true,
   skipEmptyLines:true,
-  complete:function(results){
 
+  complete:function(results){
     const rawRows = results.data;
 
     const headerIndex = rawRows.findIndex(row =>
-      row.includes("Company") && row.includes("Ticker")
+      row.includes("Company") &&
+      row.includes("Ticker")
     );
 
     if(headerIndex === -1){
       document.getElementById("status").innerText =
         "Headers not found. Make sure your sheet has Company and Ticker columns.";
+
       console.log(rawRows);
       return;
     }
 
-    const headers = rawRows[headerIndex].map(h => String(h).trim());
+    const headers =
+      rawRows[headerIndex].map(header =>
+        String(header).trim()
+      );
 
-    companies = rawRows.slice(headerIndex + 1).map(row => {
-      let obj = {};
-      headers.forEach((header, i) => {
-        obj[header] = row[i] ? String(row[i]).trim() : "";
-      });
-      return obj;
-    }).filter(row => row.Company && row.Ticker);
+    companies = rawRows
+      .slice(headerIndex + 1)
+      .map(row => {
+        const obj = {};
+
+        headers.forEach((header, index) => {
+          obj[header] =
+            row[index] ?
+            String(row[index]).trim() :
+            "";
+        });
+
+        return obj;
+      })
+      .filter(row =>
+        row.Company &&
+        row.Ticker
+      );
 
     document.getElementById("status").innerText =
-      "Database loaded: " + companies.length + " companies.";
+      "Database loaded: " +
+      companies.length +
+      " companies.";
 
-    buildTable();
-    console.log("DaVault database loaded:", companies);
+    console.log(
+      "DaVault database loaded:",
+      companies
+    );
+  },
+
+  error:function(error){
+    console.error(
+      "DaVault database error:",
+      error
+    );
+
+    document.getElementById("status").innerText =
+      "Unable to load the DaVault database.";
   }
 });
 
-function buildTable(){
-  const tbody = document.getElementById("databaseTable");
-  tbody.innerHTML = "";
-
-  companies.forEach(row => {
-    const tr = document.createElement("tr");
-
-    tr.innerHTML = `
-      <td>${getValue(row,["Company"])}</td>
-      <td class="green">${getValue(row,["Ticker"])}</td>
-      <td>${getValue(row,["Price"])}</td>
-      <td>${getValue(row,["Market Cap"])}</td>
-      <td>${getValue(row,["Shares Outstanding"])}</td>
-      <td>${getValue(row,["Shares Outstanding 1Y%chg"])}</td>
-      <td class="green">${getValue(row,["Buyback Ammo $"])}</td>
-      <td>${getValue(row,["$ Net Income TTM","Net Income TTM"])}</td>
-      <td>${getValue(row,["% Net Income Growth 1Y","Net Income Growth 1Y"])}</td>
-      <td>${getValue(row,["Debt"])}</td>
-      <td>${getValue(row,["Debt 1Y%chg"])}</td>
-    `;
-
-    tbody.appendChild(tr);
-  });
-}
-
 function searchCompany(){
-  const input = normalize(document.getElementById("companySearch").value);
+  const input = normalize(
+    document.getElementById("companySearch").value
+  );
 
   const result = companies.find(row => {
-    const company = normalize(getValue(row,["Company"]));
-    const ticker = normalize(getValue(row,["Ticker"]));
-    return ticker === input || company === input;
+    const company = normalize(
+      getValue(row,["Company"])
+    );
+
+    const ticker = normalize(
+      getValue(row,["Ticker"])
+    );
+
+    return ticker === input ||
+           company === input;
   });
 
   if(!result){
@@ -595,39 +713,116 @@ function searchCompany(){
     return;
   }
 
-  document.getElementById("resultName").innerText = getValue(result,["Company"]);
-  document.getElementById("resultTicker").innerText = "(" + getValue(result,["Ticker"]) + ")";
+  document.getElementById("resultName").innerText =
+    getValue(result,["Company"]);
 
-  document.getElementById("price").innerText = getValue(result,["Price"]);
+  document.getElementById("resultTicker").innerText =
+    "(" + getValue(result,["Ticker"]) + ")";
+
+  document.getElementById("price").innerText =
+    getValue(result,["Price"]);
+
   document.getElementById("marketCap").innerText =
-  getValue(result, ["Market Cap", "MrktCap", "MarketCap"]);
-  document.getElementById("shares").innerText = getValue(result,["Shares Outstanding"]);
-  document.getElementById("sharesChange").innerText = getValue(result,["Shares Outstanding 1Y%chg"]);
+    getValue(result,[
+      "Market Cap",
+      "MrktCap",
+      "MarketCap"
+    ]);
+
+  document.getElementById("shares").innerText =
+    getValue(result,[
+      "Shares Outstanding"
+    ]);
+
+  document.getElementById("sharesChange").innerText =
+    getValue(result,[
+      "Shares Outstanding 1Y%chg"
+    ]);
+
   document.getElementById("freeFloat").innerText =
-getValue(result,[
-  "Free Float Shares",
-  "Free Float",
-  "Float Shares"
-]);
-  document.getElementById("buyback").innerText = getValue(result,["Buyback Ammo $"]);
-  document.getElementById("netIncome").innerText = getValue(result,["$ Net Income TTM","Net Income TTM"]);
-  document.getElementById("incomeGrowth").innerText = getValue(result,["% Net Income Growth 1Y","Net Income Growth 1Y"]);
-  document.getElementById("debt").innerText = getValue(result,["Debt"]);
-  document.getElementById("debtChange").innerText = getValue(result,["Debt 1Y%chg"]);
+    getValue(result,[
+      "Free Float Shares",
+      "Free Float",
+      "Float Shares"
+    ]);
 
-  colorValue("sharesChange", document.getElementById("sharesChange").innerText, "sharesChange");
-  colorValue("buyback", document.getElementById("buyback").innerText, "buyback");
-  colorValue("incomeGrowth", document.getElementById("incomeGrowth").innerText, "incomeGrowth");
-  colorValue("debt", document.getElementById("debt").innerText, "debt");
-  colorValue("debtChange", document.getElementById("debtChange").innerText, "debtChange");
+  document.getElementById("buyback").innerText =
+    getValue(result,[
+      "Buyback Ammo $"
+    ]);
 
-  document.getElementById("resultSection").style.display = "block";
-  document.getElementById("resultSection").scrollIntoView({behavior:"smooth"});
+  document.getElementById("netIncome").innerText =
+    getValue(result,[
+      "$ Net Income TTM",
+      "Net Income TTM"
+    ]);
+
+  document.getElementById("incomeGrowth").innerText =
+    getValue(result,[
+      "% Net Income Growth 1Y",
+      "Net Income Growth 1Y"
+    ]);
+
+  document.getElementById("debt").innerText =
+    getValue(result,["Debt"]);
+
+  document.getElementById("debtChange").innerText =
+    getValue(result,[
+      "Debt 1Y%chg"
+    ]);
+
+  colorValue(
+    "sharesChange",
+    document.getElementById("sharesChange").innerText,
+    "sharesChange"
+  );
+
+  colorValue(
+    "freeFloat",
+    document.getElementById("freeFloat").innerText,
+    "freeFloat"
+  );
+
+  colorValue(
+    "buyback",
+    document.getElementById("buyback").innerText,
+    "buyback"
+  );
+
+  colorValue(
+    "incomeGrowth",
+    document.getElementById("incomeGrowth").innerText,
+    "incomeGrowth"
+  );
+
+  colorValue(
+    "debt",
+    document.getElementById("debt").innerText,
+    "debt"
+  );
+
+  colorValue(
+    "debtChange",
+    document.getElementById("debtChange").innerText,
+    "debtChange"
+  );
+
+  document.getElementById("resultSection").style.display =
+    "block";
+
+  document.getElementById("resultSection")
+    .scrollIntoView({
+      behavior:"smooth"
+    });
 }
 
-document.getElementById("companySearch").addEventListener("keydown",function(e){
-  if(e.key === "Enter") searchCompany();
-});
+document
+  .getElementById("companySearch")
+  .addEventListener("keydown",function(event){
+    if(event.key === "Enter"){
+      searchCompany();
+    }
+  });
 </script>
 
 </body>
