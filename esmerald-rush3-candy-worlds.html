@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Baby Velocity Hedgehog: Emerald Rush 3 Candy Worlds 🍭</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:#02050a;color:#fff;font-family:Arial,Helvetica,sans-serif}
+body{display:grid;place-items:center;overflow:hidden}
+.wrap{width:min(1280px,100vw);padding:8px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}
+.title{font-weight:900;font-size:clamp(22px,3vw,36px)}
+.title span{color:#4da3ff}
+.help{font-size:13px;color:#cbd5e1;text-align:right}
+.shell{position:relative;border:2px solid #4da3ff;border-radius:22px;overflow:hidden;background:#000;box-shadow:0 0 50px rgba(77,163,255,.28)}
+canvas{display:block;width:100%;height:auto;background:#68d4ff}
+.hud{position:absolute;inset:10px 10px auto 10px;display:grid;grid-template-columns:repeat(6,auto);justify-content:space-between;gap:8px;pointer-events:none;font-weight:900;text-shadow:0 2px 4px #000}
+.hud div{padding:8px 11px;border-radius:12px;background:rgba(1,8,20,.62);border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(5px)}
+.emeralds{position:absolute;top:58px;left:50%;transform:translateX(-50%);display:flex;gap:7px;padding:8px 11px;border-radius:999px;background:rgba(1,8,20,.58);border:1px solid rgba(255,255,255,.08)}
+.gem{width:22px;height:22px;clip-path:polygon(50% 0,100% 34%,82% 100%,18% 100%,0 34%);filter:grayscale(1) brightness(.38);transition:.25s}
+.gem.on{filter:none;transform:scale(1.12)}
+.overlay{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(660px,90%);padding:28px;border-radius:24px;text-align:center;background:linear-gradient(180deg,rgba(3,11,25,.96),rgba(8,22,45,.95));border:1px solid rgba(255,255,255,.18);box-shadow:0 24px 80px rgba(0,0,0,.6)}
+.overlay h2{margin:0 0 10px;font-size:clamp(36px,7vw,72px);line-height:.92}
+.overlay h2 span{color:#4da3ff;text-shadow:0 0 20px rgba(77,163,255,.6)}
+.overlay p{color:#dbe6f3;line-height:1.5}
+button{border:0;border-radius:999px;padding:13px 28px;font-size:16px;font-weight:900;background:linear-gradient(#7bc0ff,#2f89ff);color:#03101e;cursor:pointer;box-shadow:0 10px 26px rgba(47,137,255,.3)}
+#spinMeter{display:none;position:absolute;left:50%;bottom:22px;transform:translateX(-50%);width:270px;height:18px;border-radius:999px;background:rgba(0,0,0,.65);border:2px solid white;overflow:hidden}
+#spinFill{height:100%;width:0;background:linear-gradient(90deg,#4da3ff,#fff,#ffd91a)}
+.mobile{display:none;position:absolute;inset:auto 10px 10px 10px;justify-content:space-between;pointer-events:none}
+.group{display:flex;gap:10px;align-items:flex-end}
+.touch{pointer-events:auto;width:58px;height:58px;padding:0;border-radius:50%;background:rgba(2,9,20,.7);color:#fff;border:1px solid rgba(255,255,255,.35);font-size:23px;touch-action:none;user-select:none;box-shadow:none}
+.jump{width:76px;height:76px;background:rgba(77,163,255,.75);color:#03101e}
+@media(max-width:820px),(pointer:coarse){body{overflow:auto}.wrap{padding:3px}.help{display:none}.mobile{display:flex}.hud{font-size:10px}.emeralds{top:50px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="title"><span>💎💎💎</span>Emerald Rush 3: Candy Worlds 🍭</div>
+    <div class="help">Move A/D or ←/→ · Jump Space · Boost Shift · Spin Dash ↓ + Space</div>
+  </div>
+
+  <div class="shell">
+    <canvas id="game" width="1220" height="680"></canvas>
+
+    <div class="hud">
+      <div>LEVEL: <span id="levelText">1</span></div>
+      <div>RINGS: <span id="rings">0</span></div>
+      <div>EMERALDS: <span id="emeraldCount">0</span>/7</div>
+      <div>ENERGY: <span id="energy">0</span></div>
+      <div>SPEED: <span id="speed">0</span></div>
+      <div>LIVES: <span id="lives">3</span></div>
+    </div>
+
+    <div class="emeralds" id="emeraldBar"></div>
+
+    <div class="overlay" id="overlay">
+      <h2><span>EMERALD RUSH 3</span><br>CANDY WORLDS 🍭</h2>
+      <p>Collect all 7 💎, unlock Super Form 💥, and defeat the final Boss 🧁</p>
+      <button id="start">START GAME</button>
+    </div>
+
+    <div id="spinMeter"><div id="spinFill"></div></div>
+
+    <div class="mobile">
+      <div class="group">
+        <button class="touch" data-key="ArrowLeft">◀</button>
+        <button class="touch" data-key="ArrowDown">▼</button>
+        <button class="touch" data-key="ArrowRight">▶</button>
+      </div>
+      <div class="group">
+        <button class="touch" data-key="ShiftLeft">⚡</button>
+        <button class="touch jump" data-key="Space">▲</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+const canvas=document.getElementById("game");
+const ctx=canvas.getContext("2d");
+const overlay=document.getElementById("overlay");
+const startBtn=document.getElementById("start");
+const levelText=document.getElementById("levelText");
+const ringsEl=document.getElementById("rings");
+const emeraldEl=document.getElementById("emeraldCount");
+const energyEl=document.getElementById("energy");
+const speedEl=document.getElementById("speed");
+const livesEl=document.getElementById("lives");
+const emeraldBar=document.getElementById("emeraldBar");
+const spinMeter=document.getElementById("spinMeter");
+const spinFill=document.getElementById("spinFill");
+
+const GEM_COLORS=["#ff3b30","#ff9500","#ffd60a","#34c759","#32ade6","#5856d6","#ff2d95"];
+GEM_COLORS.forEach(c=>{const d=document.createElement("div");d.className="gem";d.style.background=c;emeraldBar.appendChild(d)});
+
+const WORLD=9200,GROUND=540,GRAVITY=.72;
+const keys={};
+let running=false,camera=0,checkpoint=100,flash=0,shake=0,currentLevel=1;
+let particles=[],shots=[],audioCtx=null;
+
+const player={
+ x:100,y:430,w:48,h:60,vx:0,vy:0,onGround:false,facing:1,
+ rings:0,emeralds:0,lives:3,energy:0,super:false,inv:0,
+ anim:0,spin:false,spinDash:0,charging:false,spinBoostTimer:0
+};
+
+const levels={
+  1:{
+    name:"Lollipop Meadow",
+    platforms:[
+      {x:0,y:GROUND,w:WORLD,h:150},
+      {x:520,y:440,w:240,h:28},{x:850,y:365,w:230,h:28},{x:1230,y:425,w:250,h:28},
+      {x:1650,y:345,w:210,h:28},{x:2050,y:290,w:240,h:28},{x:2470,y:415,w:260,h:28},
+      {x:2940,y:335,w:220,h:28},{x:3370,y:395,w:310,h:28},{x:3940,y:305,w:230,h:28},
+      {x:4430,y:405,w:260,h:28},{x:4950,y:330,w:230,h:28},{x:5500,y:390,w:280,h:28},
+      {x:6070,y:310,w:230,h:28},{x:6610,y:400,w:260,h:28},{x:7140,y:330,w:240,h:28},
+      {x:7700,y:390,w:280,h:28},{x:8300,y:330,w:240,h:28}
+    ],
+    rings:[[230,480,7],[550,390,5],[880,315,5],[1260,375,5],[1680,295,4],[2080,235,5],[2500,365,5],[2960,280,5],[3400,345,6],[3970,255,5],[4460,355,5],[4980,280,5],[5530,340,6],[6100,260,5],[6640,350,6],[7170,280,5],[7740,340,6],[8340,280,5],[8750,480,8]],
+    emeralds:[
+      {x:970,y:305,color:0},{x:1760,y:280,color:1},{x:2180,y:220,color:2},
+      {x:3480,y:325,color:3}
+    ],
+    enemies:[
+      {x:1530,y:GROUND-42,type:0},{x:2820,y:GROUND-42,type:1},{x:4210,y:GROUND-42,type:0},
+      {x:5200,y:GROUND-42,type:1},{x:6350,y:GROUND-42,type:0},{x:7500,y:GROUND-42,type:1}
+    ],
+    exitX:8900
+  },
+  2:{
+    name:"Cookie Carnival",
+    platforms:[
+      {x:0,y:GROUND,w:WORLD,h:150},
+      {x:420,y:430,w:220,h:28},{x:760,y:350,w:220,h:28},{x:1140,y:410,w:250,h:28},
+      {x:1530,y:320,w:220,h:28},{x:1940,y:260,w:250,h:28},{x:2380,y:405,w:250,h:28},
+      {x:2830,y:310,w:220,h:28},{x:3260,y:380,w:300,h:28},{x:3800,y:290,w:250,h:28},
+      {x:4300,y:400,w:250,h:28},{x:4810,y:315,w:240,h:28},{x:5330,y:390,w:270,h:28},
+      {x:5860,y:295,w:230,h:28},{x:6350,y:390,w:250,h:28},{x:6880,y:315,w:240,h:28},
+      {x:7420,y:385,w:270,h:28},{x:8000,y:310,w:260,h:28}
+    ],
+    rings:[[180,480,6],[450,380,5],[790,300,5],[1170,360,5],[1560,270,5],[1970,210,5],[2410,355,5],[2860,260,5],[3300,330,6],[3830,240,5],[4330,350,5],[4840,265,5],[5360,340,6],[5890,245,5],[6380,340,6],[6910,265,5],[7450,335,6],[8030,260,5],[8600,480,9]],
+    emeralds:[
+      {x:1700,y:245,color:4},{x:4900,y:240,color:5},{x:7000,y:240,color:6}
+    ],
+    enemies:[
+      {x:1350,y:GROUND-42,type:2},{x:2600,y:GROUND-42,type:3},{x:3650,y:GROUND-42,type:2},
+      {x:4550,y:GROUND-42,type:3},{x:5700,y:GROUND-42,type:2},{x:6800,y:GROUND-42,type:3},
+      {x:7900,y:GROUND-42,type:2}
+    ],
+    exitX:8600
+  },
+  3:{
+    name:"Chocolate Volcano",
+    platforms:[
+      {x:0,y:GROUND,w:WORLD,h:150},
+      {x:360,y:445,w:220,h:28},{x:700,y:365,w:210,h:28},{x:1040,y:285,w:220,h:28},
+      {x:1430,y:405,w:260,h:28},{x:1840,y:330,w:220,h:28},{x:2220,y:250,w:240,h:28},
+      {x:2670,y:390,w:250,h:28},{x:3090,y:305,w:220,h:28},{x:3500,y:225,w:250,h:28},
+      {x:3970,y:385,w:270,h:28},{x:4420,y:300,w:230,h:28},{x:4840,y:220,w:250,h:28},
+      {x:5310,y:385,w:270,h:28},{x:5770,y:300,w:230,h:28},{x:6200,y:220,w:250,h:28},
+      {x:6670,y:380,w:280,h:28},{x:7150,y:295,w:230,h:28},{x:7570,y:215,w:260,h:28},
+      {x:8070,y:360,w:290,h:28}
+    ],
+    rings:[[160,480,7],[390,395,5],[730,315,5],[1070,235,5],[1460,355,6],[1870,280,5],
+      [2250,200,5],[2700,340,6],[3120,255,5],[3530,175,6],[4000,335,6],[4450,250,5],
+      [4870,170,6],[5340,335,6],[5800,250,5],[6230,170,6],[6700,330,7],[7180,245,5],
+      [7600,165,6],[8110,310,8],[8600,480,10]],
+    emeralds:[],
+    enemies:[
+      {x:1250,y:GROUND-42,type:3},{x:2050,y:GROUND-42,type:2},{x:2900,y:GROUND-42,type:3},
+      {x:3820,y:GROUND-42,type:2},{x:4700,y:GROUND-42,type:3},{x:5600,y:GROUND-42,type:2},
+      {x:6500,y:GROUND-42,type:3},{x:7480,y:GROUND-42,type:2}
+    ],
+    exitX:8300
+  }
+};
+
+let platforms=[],ringItems=[],emeralds=[],enemies=[];
+const boss={x:8750,y:320,w:210,h:160,hp:18,maxHp:18,vx:2.6,min:8420,max:9000,active:false,alive:true,shotTimer:0};
+
+function beep(freq=440,dur=.08,type="square",vol=.05){
+ try{
+   if(!audioCtx)audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+   const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+   o.type=type;o.frequency.value=freq;g.gain.value=vol;
+   o.connect(g);g.connect(audioCtx.destination);o.start();
+   g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+dur);
+   o.stop(audioCtx.currentTime+dur);
+ }catch(e){}
+}
+
+function buildLevel(n){
+ currentLevel=n;
+ const data=levels[n];
+ platforms=data.platforms.map(p=>({...p}));
+ ringItems=[];
+ data.rings.forEach(a=>{
+   for(let i=0;i<a[2];i++)ringItems.push({x:a[0]+i*42,y:a[1],got:false,p:Math.random()*6.28});
+ });
+ emeralds=data.emeralds.map(e=>({...e,got:false}));
+ enemies=data.enemies.map((e,i)=>({
+   ...e,w:52,h:44,vx:i%2? -1.5:1.5,min:e.x-65,max:e.x+65,alive:true
+ }));
+ boss.active=false;boss.alive=true;boss.hp=boss.maxHp;boss.x=8750;shots=[];
+ checkpoint=100;player.x=100;player.y=420;player.vx=0;player.vy=0;camera=0;
+ levelText.textContent=n;
+ syncHUD();
+}
+
+function syncHUD(){
+ ringsEl.textContent=player.rings;emeraldEl.textContent=player.emeralds;
+ energyEl.textContent=Math.floor(player.energy);speedEl.textContent=Math.round(Math.abs(player.vx)*10);
+ livesEl.textContent=player.lives;
+ [...emeraldBar.children].forEach((g,i)=>g.classList.toggle("on",i<player.emeralds));
+}
+
+function resetGame(){
+ player.rings=0;player.emeralds=0;player.lives=3;player.energy=0;player.super=false;
+ player.inv=90;player.spin=false;player.spinDash=0;player.charging=false;player.spinBoostTimer=0;
+ particles=[];buildLevel(1);
+ spinMeter.style.display="none";spinFill.style.width="0%";
+}
+
+function jump(){
+ const down=keys.ArrowDown||keys.KeyS||keys.s;
+ if(player.super){
+   player.vy=-8.5;beep(700,.05,"sine",.03);return;
+ }
+ if(player.onGround&&down){
+   player.charging=true;player.spin=true;
+   player.spinDash=Math.min(20,Math.max(7,player.spinDash+4));
+   spinMeter.style.display="block";
+   spinFill.style.width=(player.spinDash/20*100)+"%";
+   addParticles(player.x+24,player.y+48,"#67b7ff",8,3);
+   beep(170+player.spinDash*22,.06,"sawtooth",.03);
+   return;
+ }
+ if(player.onGround){
+   player.vy=-15.2;player.onGround=false;player.spin=true;
+   beep(520,.07,"square",.035);
+ }
+}
+
+function launchSpinDash(){
+ if(!player.charging||player.spinDash<=0)return;
+
+ const charge=player.spinDash/20;
+ const launchSpeed=18+charge*18;
+
+ player.vx=player.facing*launchSpeed;
+ player.vy=-.35;
+ player.spin=true;
+ player.onGround=false;
+ player.spinBoostTimer=55+Math.round(charge*45);
+
+ player.charging=false;
+ player.spinDash=0;
+
+ spinMeter.style.display="none";
+ spinFill.style.width="0%";
+
+ addParticles(player.x+24,player.y+50,"#9bd0ff",28,9);
+ shake=8;
+ beep(95,.18,"sawtooth",.075);
+}
+
+addEventListener("keydown",e=>{
+ keys[e.code]=true;keys[e.key]=true;
+ if(e.code==="Space")jump();
+ if(["ArrowLeft","ArrowRight","ArrowDown","Space"].includes(e.code))e.preventDefault();
+});
+addEventListener("keyup",e=>{
+ keys[e.code]=false;keys[e.key]=false;
+ if(e.code==="ArrowDown"||e.code==="KeyS"||e.key==="ArrowDown"||e.key==="s")launchSpinDash();
+});
+
+document.querySelectorAll(".touch").forEach(btn=>{
+ const k=btn.dataset.key;
+ const down=e=>{e.preventDefault();keys[k]=true;if(k==="Space")jump()};
+ const up=e=>{e.preventDefault();keys[k]=false;if(k==="ArrowDown")launchSpinDash()};
+ btn.addEventListener("pointerdown",down);btn.addEventListener("pointerup",up);
+ btn.addEventListener("pointercancel",up);btn.addEventListener("pointerleave",up);
+});
+
+startBtn.onclick=()=>{
+ overlay.style.display="none";running=true;resetGame();requestAnimationFrame(loop);
+};
+
+function addParticles(x,y,color,count=12,speed=4){
+ for(let i=0;i<count;i++)particles.push({
+   x,y,vx:(Math.random()-.5)*speed*2,vy:(Math.random()-.5)*speed*2,
+   life:30+Math.random()*25,color,size:2+Math.random()*4
+ });
+}
+
+function transform(){
+ if(player.super)return;
+ player.super=true;player.energy=100;player.inv=999999;flash=40;shake=14;
+ addParticles(player.x+24,player.y+28,"#fff34c",60,9);
+ beep(900,.3,"sawtooth",.07);
+}
+
+function transitionLevel(nextLevel){
+ running=false;
+ const names={2:"COOKIE CARNIVAL",3:"CHOCOLATE VOLCANO"};
+ const descriptions={
+   2:"The last three emeralds are hidden across the cookie carnival.",
+   3:"All seven emeralds are yours. Cross the chocolate volcano and destroy the final machine."
+ };
+ overlay.innerHTML=`<h2><span>LEVEL ${nextLevel}</span></h2><p>${names[nextLevel]}</p><p>${descriptions[nextLevel]}</p><button id="continue">CONTINUE</button>`;
+ overlay.style.display="block";
+ document.getElementById("continue").onclick=()=>{
+   overlay.style.display="none";
+   buildLevel(nextLevel);
+   running=true;
+   requestAnimationFrame(loop);
+ };
+}
+
+function endScreen(title,text){
+ running=false;
+ overlay.innerHTML=`<h2>${title}</h2><p>${text}</p><button id="again">PLAY AGAIN</button>`;
+ overlay.style.display="block";
+ document.getElementById("again").onclick=()=>{
+   overlay.style.display="none";running=true;resetGame();requestAnimationFrame(loop);
+ };
+}
+
+function hurt(){
+ if(player.super||player.inv>0)return;
+ shake=10;
+ if(player.rings>0){
+   player.rings=Math.max(0,player.rings-10);
+   player.vy=-10;player.vx=-player.facing*6;player.inv=120;
+   addParticles(player.x,player.y,"#ffd21e",20,7);
+ }else{
+   player.lives--;
+   if(player.lives<=0){endScreen("GAME OVER","Try again and collect more rings.");return}
+   player.x=checkpoint;player.y=420;player.vx=0;player.vy=0;player.inv=90;
+ }
+ syncHUD();
+}
+
+function update(){
+ const left=keys.ArrowLeft||keys.KeyA||keys.a;
+ const right=keys.ArrowRight||keys.KeyD||keys.d;
+ const boost=keys.ShiftLeft||keys.ShiftRight||keys.Shift;
+ const fly=keys.Space;
+
+ if(!player.charging&&left){player.vx-=player.super?.76:.62;player.facing=-1}
+ if(!player.charging&&right){player.vx+=player.super?.76:.62;player.facing=1}
+ if(player.charging)player.vx*=.75;
+ if(!left&&!right&&!player.spin)player.vx*=player.super?.93:.86;
+ if(player.spinBoostTimer>0)player.vx*=.997;
+
+ if(player.spinBoostTimer>0){
+   player.spinBoostTimer--;
+   player.spin=true;
+
+   if(left&&player.facing<0)player.vx-=.08;
+   if(right&&player.facing>0)player.vx+=.08;
+
+   player.vx*=.994;
+
+   if(Math.abs(player.vx)<11){
+     player.spinBoostTimer=0;
+   }
+ }
+
+ const normalMax=player.super?(boost?20:15):(boost?14.8:10.2);
+ const max=player.spinBoostTimer>0?38:normalMax;
+ player.vx=Math.max(-max,Math.min(max,player.vx));
+ if(Math.abs(player.vx)<.04)player.vx=0;
+
+ const oldBottom=player.y+player.h;
+ if(player.super){
+   player.vy+=fly?-.58:.24;
+   player.vy=Math.max(-9.5,Math.min(8.5,player.vy));
+   player.energy-=.04;
+   if(player.energy<=0){player.energy=0;player.super=false;player.inv=120}
+ }else player.vy+=GRAVITY;
+
+ player.x+=player.vx;player.y+=player.vy;
+ player.x=Math.max(0,Math.min(WORLD-player.w,player.x));
+ player.onGround=false;player.anim+=Math.abs(player.vx)*.14;
+
+ for(const p of platforms){
+   const hit=player.x+player.w>p.x&&player.x<p.x+p.w&&player.y+player.h>=p.y&&player.y<p.y+p.h;
+   if(hit&&oldBottom<=p.y+5&&player.vy>=0){
+     player.y=p.y-player.h;player.vy=0;player.onGround=true;
+     if(!player.charging&&player.spinBoostTimer<=0)player.spin=false;
+   }
+ }
+
+ for(const r of ringItems){
+   if(r.got)continue;
+   const dx=player.x+player.w/2-r.x,dy=player.y+player.h/2-r.y;
+   if(dx*dx+dy*dy<36*36){
+     r.got=true;player.rings++;
+     if(player.super)player.energy=Math.min(100,player.energy+2);
+     addParticles(r.x,r.y,"#ffd21e",8,3);
+   }
+ }
+
+ for(const e of emeralds){
+   if(e.got)continue;
+   const dx=player.x+player.w/2-e.x,dy=player.y+player.h/2-e.y;
+   if(dx*dx+dy*dy<44*44){
+     e.got=true;player.emeralds++;flash=20;shake=7;
+     addParticles(e.x,e.y,GEM_COLORS[e.color],28,7);
+     if(player.emeralds===7)transform();
+   }
+ }
+
+ for(const e of enemies){
+   if(!e.alive)continue;
+   e.x+=e.vx;if(e.x<e.min||e.x>e.max)e.vx*=-1;
+   if(player.x<e.x+e.w&&player.x+player.w>e.x&&player.y<e.y+e.h&&player.y+player.h>e.y){
+     if(player.super||player.spin||player.vy>2){
+       e.alive=false;player.vy=-9;
+       addParticles(e.x,e.y,e.type>=2?"#56f0ff":"#ff4b35",24,7);
+     }else hurt();
+   }
+ }
+
+ if(currentLevel===1&&player.x>levels[1].exitX){
+   transitionLevel(2);
+   return;
+ }
+
+ if(currentLevel===2&&player.x>levels[2].exitX){
+   transitionLevel(3);
+   return;
+ }
+
+ if(currentLevel===3&&player.x>8300&&!boss.active)boss.active=true;
+
+ if(boss.active&&boss.alive){
+   boss.x+=boss.vx;if(boss.x<boss.min||boss.x>boss.max)boss.vx*=-1;
+   boss.shotTimer--;
+   if(boss.shotTimer<=0){
+     shots.push({x:boss.x,y:boss.y+75,vx:-6.4,vy:(Math.random()-.5)*3,w:20,h:20});
+     boss.shotTimer=44;
+   }
+   if(player.x<boss.x+boss.w&&player.x+player.w>boss.x&&player.y<boss.y+boss.h&&player.y+player.h>boss.y){
+     if(player.super||player.spin){
+       boss.hp--;player.vx=-player.facing*9;player.vy=-7;flash=8;shake=12;
+       addParticles(boss.x+boss.w/2,boss.y+boss.h/2,"#ff5b39",30,8);
+       if(boss.hp<=0){
+         boss.alive=false;
+         addParticles(boss.x+boss.w/2,boss.y+boss.h/2,"#ffd43b",100,12);
+         setTimeout(()=>endScreen("<span>YOU WON!</span>","All three levels completed and the final robot was destroyed!"),650);
+       }
+     }else hurt();
+   }
+ }
+
+ for(let i=shots.length-1;i>=0;i--){
+   const s=shots[i];s.x+=s.vx;s.y+=s.vy;
+   if(s.x<camera-100||s.y>720){shots.splice(i,1);continue}
+   if(player.x<s.x+s.w&&player.x+player.w>s.x&&player.y<s.y+s.h&&player.y+player.h>s.y){
+     if(player.super||player.spin){addParticles(s.x,s.y,"#ffcc33",13,4);shots.splice(i,1)}
+     else{shots.splice(i,1);hurt()}
+   }
+ }
+
+ for(let i=particles.length-1;i>=0;i--){
+   const p=particles[i];p.x+=p.vx;p.y+=p.vy;p.vy+=.08;p.life--;
+   if(p.life<=0)particles.splice(i,1);
+ }
+
+ if(player.y>780)hurt();
+
+ camera+=(player.x-canvas.width*.35-camera)*.1;
+ camera=Math.max(0,Math.min(WORLD-canvas.width,camera));
+ if(flash>0)flash--;if(shake>0)shake*=.86;
+ syncHUD();
+}
+
+function hill(x,base,w,h,color){
+ ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(x,base);
+ ctx.quadraticCurveTo(x+w/2,base-h,x+w,base);
+ ctx.lineTo(x+w,680);ctx.lineTo(x,680);ctx.fill();
+}
+
+function palm(x,y,s=1){
+ ctx.save();ctx.translate(x,y);ctx.scale(s,s);
+ ctx.strokeStyle="#754820";ctx.lineWidth=8;
+ ctx.beginPath();ctx.moveTo(0,0);ctx.quadraticCurveTo(-7,-45,3,-92);ctx.stroke();
+ ctx.fillStyle="#159852";
+ for(let i=0;i<7;i++){
+   ctx.save();ctx.translate(3,-92);ctx.rotate((i-3)*.43);
+   ctx.beginPath();ctx.ellipse(28,0,31,8,0,0,7);ctx.fill();ctx.restore();
+ }
+ ctx.restore();
+}
+
+function drawTropicalBackground(){
+  const g=ctx.createLinearGradient(0,0,0,680);
+  if(player.super){
+    g.addColorStop(0,"#7c3aed");
+    g.addColorStop(.52,"#fb7185");
+    g.addColorStop(1,"#fde68a");
+  }else{
+    g.addColorStop(0,"#67e8f9");
+    g.addColorStop(.55,"#fbcfe8");
+    g.addColorStop(1,"#fff7ed");
+  }
+  ctx.fillStyle=g;
+  ctx.fillRect(0,0,1220,680);
+
+  // Marshmallow clouds
+  for(let i=0;i<11;i++){
+    const x=((i*250-camera*.12)%1500+1500)%1500-130;
+    const y=62+(i%3)*58;
+    ctx.fillStyle=i%2?"rgba(255,255,255,.92)":"rgba(255,240,249,.94)";
+    ctx.beginPath();
+    ctx.arc(x,y,26,0,7);
+    ctx.arc(x+34,y-10,38,0,7);
+    ctx.arc(x+72,y,28,0,7);
+    ctx.fill();
+  }
+
+  // Ice-cream mountains
+  for(let i=0;i<8;i++){
+    const x=i*520-(camera*.20%520)-150;
+    const h=190+(i%3)*35;
+    ctx.fillStyle=i%2?"#f9a8d4":"#c4b5fd";
+    ctx.beginPath();
+    ctx.moveTo(x,535);
+    ctx.quadraticCurveTo(x+210,535-h,x+420,535);
+    ctx.lineTo(x+420,680);
+    ctx.lineTo(x,680);
+    ctx.fill();
+
+    ctx.fillStyle="#fff7ed";
+    ctx.beginPath();
+    ctx.moveTo(x+120,535-h*.55);
+    ctx.quadraticCurveTo(x+210,535-h,x+300,535-h*.55);
+    ctx.quadraticCurveTo(x+270,535-h*.42,x+245,535-h*.50);
+    ctx.quadraticCurveTo(x+220,535-h*.38,x+195,535-h*.50);
+    ctx.quadraticCurveTo(x+170,535-h*.40,x+120,535-h*.55);
+    ctx.fill();
+  }
+
+  // Candy hills
+  for(let i=0;i<11;i++){
+    hill(
+      i*390-(camera*.38%390)-110,
+      548,
+      330,
+      150,
+      i%2?"#86efac":"#fda4af"
+    );
+  }
+
+  // Giant lollipops
+  for(let i=0;i<9;i++){
+    const x=i*350-(camera*.58%350)+40;
+    const y=490;
+    ctx.strokeStyle="#fff7ed";
+    ctx.lineWidth=12;
+    ctx.beginPath();
+    ctx.moveTo(x,y);
+    ctx.lineTo(x,y-120);
+    ctx.stroke();
+
+    ctx.save();
+    ctx.translate(x,y-145);
+    ctx.rotate((i%2?1:-1)*.18);
+    const colors=["#fb7185","#60a5fa","#facc15","#a78bfa","#34d399"];
+    for(let r=48;r>5;r-=8){
+      ctx.strokeStyle=colors[(i+Math.floor(r/8))%colors.length];
+      ctx.lineWidth=8;
+      ctx.beginPath();
+      ctx.arc(0,0,r,0,Math.PI*1.55);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  // Strawberry milk river
+  const milk=ctx.createLinearGradient(0,565,0,680);
+  milk.addColorStop(0,"#fff1f2");
+  milk.addColorStop(.3,"#f9a8d4");
+  milk.addColorStop(1,"#db2777");
+  ctx.fillStyle=milk;
+  ctx.fillRect(0,570,1220,110);
+
+  ctx.strokeStyle="rgba(255,255,255,.7)";
+  ctx.lineWidth=4;
+  for(let i=0;i<9;i++){
+    const x=((i*180-camera*.55)%1450+1450)%1450-90;
+    ctx.beginPath();
+    ctx.moveTo(x,595+(i%2)*22);
+    ctx.bezierCurveTo(x+45,580,x+95,615,x+150,592);
+    ctx.stroke();
+  }
+}
+
+function drawCityBackground(){
+  const g=ctx.createLinearGradient(0,0,0,680);
+  g.addColorStop(0,player.super?"#4c1d95":"#312e81");
+  g.addColorStop(.52,player.super?"#db2777":"#7c3aed");
+  g.addColorStop(1,"#f9a8d4");
+  ctx.fillStyle=g;
+  ctx.fillRect(0,0,1220,680);
+
+  // Sugar stars and sprinkles
+  for(let i=0;i<95;i++){
+    const x=((i*137-camera*.05)%1320+1320)%1320;
+    const y=(i*61)%390;
+    const sprinkle=["#fde047","#67e8f9","#f9a8d4","#86efac","#ffffff"][i%5];
+    ctx.fillStyle=sprinkle;
+    ctx.save();
+    ctx.translate(x,y);
+    ctx.rotate((i%7)*.32);
+    ctx.fillRect(-4,-1,8,3);
+    ctx.restore();
+  }
+
+  // Cookie buildings
+  for(let i=0;i<17;i++){
+    const x=i*105-(camera*.18%105)-30;
+    const h=140+(i%5)*42;
+    const body=i%2?"#b45309":"#d97706";
+    ctx.fillStyle=body;
+    ctx.beginPath();
+    ctx.roundRect(x,525-h,86,h,18);
+    ctx.fill();
+
+    // Frosting roof
+    ctx.fillStyle=i%3===0?"#f9a8d4":i%3===1?"#a7f3d0":"#fef3c7";
+    ctx.beginPath();
+    ctx.moveTo(x-5,525-h+18);
+    ctx.quadraticCurveTo(x+18,525-h-12,x+43,525-h+10);
+    ctx.quadraticCurveTo(x+64,525-h-14,x+92,525-h+18);
+    ctx.lineTo(x+92,525-h+30);
+    ctx.lineTo(x-5,525-h+30);
+    ctx.fill();
+
+    // Candy windows and chocolate chips
+    for(let y=525-h+52;y<500;y+=30){
+      ctx.fillStyle=(i+y)%2?"#67e8f9":"#fde047";
+      ctx.fillRect(x+16,y,13,16);
+      ctx.fillRect(x+55,y,13,16);
+    }
+    ctx.fillStyle="#5b2c16";
+    for(let c=0;c<5;c++){
+      ctx.beginPath();
+      ctx.arc(x+15+(c*17)%65,525-h+38+(c*37)%(h-55),4,0,7);
+      ctx.fill();
+    }
+  }
+
+  // Candy-cane rails
+  for(let i=0;i<8;i++){
+    const x=i*220-(camera*.55%220)-20;
+    ctx.strokeStyle="#fff7ed";
+    ctx.lineWidth=19;
+    ctx.beginPath();
+    ctx.moveTo(x,535);
+    ctx.lineTo(x,425);
+    ctx.quadraticCurveTo(x,400,x+28,400);
+    ctx.lineTo(x+100,400);
+    ctx.stroke();
+
+    ctx.strokeStyle="#ef4444";
+    ctx.lineWidth=5;
+    for(let y=420;y<530;y+=22){
+      ctx.beginPath();
+      ctx.moveTo(x-8,y);
+      ctx.lineTo(x+8,y+10);
+      ctx.stroke();
+    }
+  }
+
+  // Blue raspberry soda floor
+  const soda=ctx.createLinearGradient(0,570,0,680);
+  soda.addColorStop(0,"#bae6fd");
+  soda.addColorStop(.35,"#38bdf8");
+  soda.addColorStop(1,"#0369a1");
+  ctx.fillStyle=soda;
+  ctx.fillRect(0,570,1220,110);
+
+  for(let i=0;i<24;i++){
+    const x=((i*83-camera*.7)%1300+1300)%1300;
+    const y=585+(i*29)%80;
+    ctx.strokeStyle="rgba(255,255,255,.62)";
+    ctx.lineWidth=2;
+    ctx.beginPath();
+    ctx.arc(x,y,3+(i%4),0,7);
+    ctx.stroke();
+  }
+}
+
+function drawFortressBackground(){
+  const g=ctx.createLinearGradient(0,0,0,680);
+  g.addColorStop(0,player.super?"#581c87":"#2e1065");
+  g.addColorStop(.48,player.super?"#e11d48":"#7f1d1d");
+  g.addColorStop(1,"#2a0f08");
+  ctx.fillStyle=g;
+  ctx.fillRect(0,0,1220,680);
+
+  // Floating cocoa dust and hot sugar sparks
+  for(let i=0;i<100;i++){
+    const x=((i*139-camera*.08)%1360+1360)%1360;
+    const y=(i*79+performance.now()*.035)%560;
+    ctx.fillStyle=i%5===0?"#fde68a":"rgba(251,146,60,.62)";
+    ctx.beginPath();
+    ctx.arc(x,y,1.5+(i%3),0,7);
+    ctx.fill();
+  }
+
+  // Chocolate volcanoes with vanilla icing
+  for(let i=0;i<7;i++){
+    const x=i*315-(camera*.16%315)-120;
+    const h=185+(i%3)*65;
+    ctx.fillStyle=i%2?"#3f1d14":"#5b2c16";
+    ctx.beginPath();
+    ctx.moveTo(x,540);
+    ctx.lineTo(x+138,540-h);
+    ctx.lineTo(x+276,540);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.fillStyle="#fff7ed";
+    ctx.beginPath();
+    ctx.moveTo(x+103,540-h+45);
+    ctx.lineTo(x+138,540-h);
+    ctx.lineTo(x+174,540-h+48);
+    ctx.lineTo(x+157,540-h+38);
+    ctx.lineTo(x+145,540-h+65);
+    ctx.lineTo(x+126,540-h+38);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.strokeStyle="#f59e0b";
+    ctx.lineWidth=7;
+    ctx.beginPath();
+    ctx.moveTo(x+138,540-h+18);
+    ctx.bezierCurveTo(x+120,540-h+70,x+165,540-h+90,x+150,540-h+145);
+    ctx.stroke();
+  }
+
+  // Wafer and gingerbread castle towers
+  for(let i=0;i<14;i++){
+    const x=i*175-(camera*.28%175)-45;
+    const h=115+(i%5)*35;
+
+    ctx.fillStyle=i%2?"#92400e":"#b45309";
+    ctx.fillRect(x,540-h,128,h);
+
+    ctx.fillStyle="#fef3c7";
+    ctx.fillRect(x,540-h,128,9);
+
+    // Wafer grid
+    ctx.strokeStyle="rgba(92,45,15,.48)";
+    ctx.lineWidth=2;
+    for(let gx=x+14;gx<x+128;gx+=22){
+      ctx.beginPath();
+      ctx.moveTo(gx,540-h+12);
+      ctx.lineTo(gx,538);
+      ctx.stroke();
+    }
+    for(let gy=540-h+25;gy<538;gy+=22){
+      ctx.beginPath();
+      ctx.moveTo(x+4,gy);
+      ctx.lineTo(x+124,gy);
+      ctx.stroke();
+    }
+
+    // Gumdrop windows
+    for(let row=0;row<3;row++){
+      ctx.fillStyle=["#fb7185","#60a5fa","#34d399"][(row+i)%3];
+      ctx.beginPath();
+      ctx.roundRect(x+18,540-h+28+row*27,18,12,6);
+      ctx.roundRect(x+55,540-h+28+row*27,18,12,6);
+      ctx.roundRect(x+92,540-h+28+row*27,18,12,6);
+      ctx.fill();
+    }
+  }
+
+  // Molten chocolate river
+  const chocolate=ctx.createLinearGradient(0,565,0,680);
+  chocolate.addColorStop(0,"#fbbf24");
+  chocolate.addColorStop(.09,"#d97706");
+  chocolate.addColorStop(.28,"#7c2d12");
+  chocolate.addColorStop(1,"#2a0f08");
+  ctx.fillStyle=chocolate;
+  ctx.fillRect(0,570,1220,110);
+
+  // Caramel streaks
+  ctx.strokeStyle="rgba(254,215,170,.82)";
+  ctx.lineWidth=5;
+  for(let i=0;i<9;i++){
+    const x=((i*185-camera*.6)%1450+1450)%1450-85;
+    ctx.beginPath();
+    ctx.moveTo(x,590+(i%2)*22);
+    ctx.bezierCurveTo(x+45,575,x+95,620,x+150,592);
+    ctx.stroke();
+  }
+}
+function drawPlatform(p){
+  const x=p.x-camera;
+
+  if(currentLevel===1){
+    // Layer cake platforms
+    const cake=ctx.createLinearGradient(x,p.y,x,p.y+p.h);
+    cake.addColorStop(0,"#fef3c7");
+    cake.addColorStop(.3,"#f9a8d4");
+    cake.addColorStop(.58,"#fde68a");
+    cake.addColorStop(1,"#b45309");
+    ctx.fillStyle=cake;
+    ctx.fillRect(x,p.y,p.w,p.h);
+
+    // Frosting
+    ctx.fillStyle=player.super?"#fde047":"#fff7ed";
+    ctx.fillRect(x,p.y,p.w,10);
+    for(let i=0;i<p.w;i+=34){
+      ctx.beginPath();
+      ctx.arc(x+i+12,p.y+10,12,0,Math.PI);
+      ctx.fill();
+    }
+
+    // Sprinkles
+    const sprinkles=["#fb7185","#60a5fa","#34d399","#a78bfa"];
+    for(let i=12;i<p.w;i+=30){
+      ctx.fillStyle=sprinkles[(i/30|0)%sprinkles.length];
+      ctx.save();
+      ctx.translate(x+i,p.y+19);
+      ctx.rotate((i%3)-1);
+      ctx.fillRect(-4,-1,8,3);
+      ctx.restore();
+    }
+
+  }else if(currentLevel===2){
+    // Chocolate chip cookie platforms
+    const cookie=ctx.createLinearGradient(x,p.y,x,p.y+p.h);
+    cookie.addColorStop(0,"#fbbf24");
+    cookie.addColorStop(.45,"#d97706");
+    cookie.addColorStop(1,"#92400e");
+    ctx.fillStyle=cookie;
+    ctx.fillRect(x,p.y,p.w,p.h);
+
+    ctx.fillStyle="#fef3c7";
+    ctx.fillRect(x,p.y,p.w,6);
+
+    ctx.fillStyle="#5b2c16";
+    for(let i=14;i<p.w;i+=35){
+      ctx.beginPath();
+      ctx.arc(x+i,p.y+15+(i%2)*5,4,0,7);
+      ctx.fill();
+    }
+
+    ctx.fillStyle="#fb7185";
+    for(let i=8;i<p.w;i+=58){
+      ctx.fillRect(x+i,p.y+7,18,4);
+    }
+
+  }else{
+    // Dark chocolate wafer platforms
+    const wafer=ctx.createLinearGradient(x,p.y,x,p.y+p.h);
+    wafer.addColorStop(0,"#92400e");
+    wafer.addColorStop(.25,"#5b2c16");
+    wafer.addColorStop(1,"#2a0f08");
+    ctx.fillStyle=wafer;
+    ctx.fillRect(x,p.y,p.w,p.h);
+
+    // Caramel edge
+    ctx.fillStyle="#f59e0b";
+    ctx.fillRect(x,p.y,p.w,7);
+
+    // Wafer pattern
+    ctx.strokeStyle="rgba(254,215,170,.36)";
+    ctx.lineWidth=2;
+    for(let i=12;i<p.w;i+=30){
+      ctx.beginPath();
+      ctx.moveTo(x+i,p.y+9);
+      ctx.lineTo(x+i-10,p.y+p.h);
+      ctx.stroke();
+    }
+
+    // Candy embers
+    ctx.fillStyle="#fde68a";
+    for(let i=10;i<p.w;i+=42){
+      ctx.fillRect(x+i,p.y+12,15,4);
+      ctx.fillRect(x+i+5,p.y+19,6,6);
+    }
+  }
+}
+
+function drawGem(x,y,color,scale=1){
+ ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);
+ ctx.shadowColor=GEM_COLORS[color];ctx.shadowBlur=20;
+ const grad=ctx.createLinearGradient(0,-19,0,19);
+ grad.addColorStop(0,"#fff");grad.addColorStop(.18,GEM_COLORS[color]);grad.addColorStop(1,"#111");
+ ctx.fillStyle=grad;ctx.beginPath();
+ ctx.moveTo(0,-19);ctx.lineTo(18,-5);ctx.lineTo(12,19);ctx.lineTo(-12,19);ctx.lineTo(-18,-5);
+ ctx.closePath();ctx.fill();ctx.restore();
+}
+
+function drawPlayer(){
+ const x=player.x-camera,y=player.y;
+ if(!player.super&&player.inv>0&&Math.floor(player.inv/6)%2===0)return;
+ const run=Math.sin(player.anim)*6;
+
+ ctx.save();ctx.translate(x+24,y+30);if(player.facing<0)ctx.scale(-1,1);
+ if(player.super){ctx.shadowColor="#fff43a";ctx.shadowBlur=30}
+
+ if((player.spin||!player.onGround)&&!player.super){
+   ctx.rotate(player.anim*.15);
+   const grad=ctx.createRadialGradient(-5,-8,3,0,0,25);
+   grad.addColorStop(0,"#69b7ff");grad.addColorStop(.5,"#0878ff");grad.addColorStop(1,"#003b88");
+   ctx.fillStyle=grad;ctx.beginPath();ctx.arc(0,0,25,0,7);ctx.fill();
+   ctx.strokeStyle="#72bdff";ctx.lineWidth=4;ctx.beginPath();ctx.arc(0,0,18,0,Math.PI*1.45);ctx.stroke();
+   ctx.restore();return;
+ }
+
+ const flying=player.super&&!player.onGround;
+ if(flying){ctx.rotate(player.vy*.012);ctx.scale(1.12,.95)}
+
+ const body=ctx.createLinearGradient(-18,-24,18,24);
+ if(player.super){body.addColorStop(0,"#fff77d");body.addColorStop(.42,"#ffd91a");body.addColorStop(1,"#d18a00")}
+ else{body.addColorStop(0,"#54acff");body.addColorStop(.5,"#0878ff");body.addColorStop(1,"#004599")}
+ ctx.fillStyle=body;
+
+ ctx.beginPath();ctx.ellipse(0,0,23,28,0,0,7);ctx.fill();
+ ctx.beginPath();ctx.moveTo(-7,-21);ctx.lineTo(-34,-17);ctx.lineTo(-17,-3);ctx.lineTo(-37,2);ctx.lineTo(-15,11);ctx.lineTo(-31,21);ctx.lineTo(-7,20);ctx.fill();
+ ctx.fillStyle="#ffd8a8";ctx.beginPath();ctx.ellipse(9,7,13,17,0,0,7);ctx.fill();
+ ctx.fillStyle="#fff";ctx.beginPath();ctx.ellipse(9,-11,8,12,0,0,7);ctx.fill();
+ ctx.fillStyle="#0d1630";ctx.beginPath();ctx.arc(12,-9,3,0,7);ctx.fill();
+ // Ear, brow, nose, and smile details
+ ctx.fillStyle=player.super?"#ffd91a":"#0878ff";
+ ctx.beginPath();ctx.moveTo(-7,-21);ctx.lineTo(-2,-38);ctx.lineTo(6,-20);ctx.closePath();ctx.fill();
+ ctx.fillStyle="#ffd8a8";ctx.beginPath();ctx.moveTo(-3,-23);ctx.lineTo(-1,-32);ctx.lineTo(3,-22);ctx.closePath();ctx.fill();
+ ctx.fillStyle="#111827";ctx.beginPath();ctx.arc(21,-2,4,0,7);ctx.fill();
+ ctx.strokeStyle="#4a2615";ctx.lineWidth=1.6;ctx.beginPath();ctx.arc(13,6,8,.2,1.35);ctx.stroke();
+
+ ctx.strokeStyle="#fff";ctx.lineWidth=4;
+ ctx.beginPath();ctx.moveTo(-7,7);ctx.lineTo(flying?-28:-19,11+run*.18);ctx.stroke();
+ ctx.beginPath();ctx.moveTo(4,12);ctx.lineTo(flying?-18:14,19-run*.18);ctx.stroke();
+
+ // Genesis-style shoes with white cuffs, stripe, soles, and visible laces
+ const shoe1X=flying?-20:-10,shoe1Y=25+run;
+ const shoe2X=flying?-4:13,shoe2Y=25-run;
+
+ ctx.fillStyle="#ffffff";
+ ctx.beginPath();ctx.ellipse(shoe1X-2,shoe1Y-5,9,5,0,0,7);ctx.fill();
+ ctx.beginPath();ctx.ellipse(shoe2X-2,shoe2Y-5,9,5,0,0,7);ctx.fill();
+
+ ctx.fillStyle="#ed2939";
+ ctx.beginPath();ctx.ellipse(shoe1X,shoe1Y,16,7,-.08,0,7);ctx.fill();
+ ctx.beginPath();ctx.ellipse(shoe2X,shoe2Y,16,7,-.08,0,7);ctx.fill();
+
+ // White shoe stripe
+ ctx.strokeStyle="#ffffff";ctx.lineWidth=3;
+ ctx.beginPath();ctx.moveTo(shoe1X-7,shoe1Y-3);ctx.lineTo(shoe1X+6,shoe1Y+1);ctx.stroke();
+ ctx.beginPath();ctx.moveTo(shoe2X-7,shoe2Y-3);ctx.lineTo(shoe2X+6,shoe2Y+1);ctx.stroke();
+
+ // White laces
+ ctx.lineWidth=1.8;
+ for(let i=0;i<3;i++){
+   ctx.beginPath();ctx.moveTo(shoe1X-5+i*4,shoe1Y-4);ctx.lineTo(shoe1X-2+i*4,shoe1Y+1);ctx.stroke();
+   ctx.beginPath();ctx.moveTo(shoe2X-5+i*4,shoe2Y-4);ctx.lineTo(shoe2X-2+i*4,shoe2Y+1);ctx.stroke();
+ }
+
+ // White soles
+ ctx.fillStyle="#ffffff";
+ ctx.beginPath();ctx.ellipse(shoe1X+1,shoe1Y+5,15,2.7,-.08,0,7);ctx.fill();
+ ctx.beginPath();ctx.ellipse(shoe2X+1,shoe2Y+5,15,2.7,-.08,0,7);ctx.fill();
+
+ // Small gold buckles
+ ctx.fillStyle="#ffd91a";
+ ctx.fillRect(shoe1X-2,shoe1Y-4,4,3);
+ ctx.fillRect(shoe2X-2,shoe2Y-4,4,3);
+ ctx.restore();
+
+ if(player.super){
+   ctx.strokeStyle="rgba(255,245,70,.72)";ctx.lineWidth=3;
+   for(let i=0;i<4;i++){ctx.beginPath();ctx.arc(x+24,y+30,35+i*8,0,7);ctx.stroke()}
+ }
+}
+
+function drawEnemy(e){
+ if(!e.alive)return;
+
+ const x=e.x-camera;
+ const y=e.y;
+ const isGummy=e.type<2;
+ const bounce=Math.sin(performance.now()*.008+e.x*.01)*2;
+
+ ctx.save();
+ ctx.translate(0,bounce);
+
+ if(isGummy){
+   // GUMMY BEAR BAD GUY
+   ctx.shadowColor=e.type===0?"#ff4f8b":"#ffb52e";
+   ctx.shadowBlur=18;
+
+   const gummy=ctx.createLinearGradient(x,y,x,y+e.h);
+   if(e.type===0){
+     gummy.addColorStop(0,"#ffb2cf");
+     gummy.addColorStop(.35,"#ff4f8b");
+     gummy.addColorStop(1,"#b71859");
+   }else{
+     gummy.addColorStop(0,"#fff0a3");
+     gummy.addColorStop(.35,"#ffb52e");
+     gummy.addColorStop(1,"#d45b16");
+   }
+
+   // Ears
+   ctx.fillStyle=gummy;
+   ctx.beginPath();
+   ctx.arc(x+14,y+10,10,0,Math.PI*2);
+   ctx.arc(x+38,y+10,10,0,Math.PI*2);
+   ctx.fill();
+
+   // Gummy body
+   ctx.beginPath();
+   ctx.roundRect(x+5,y+8,42,34,15);
+   ctx.fill();
+
+   // Transparent candy shine
+   ctx.fillStyle="rgba(255,255,255,.38)";
+   ctx.beginPath();
+   ctx.ellipse(x+17,y+18,7,11,-.45,0,Math.PI*2);
+   ctx.fill();
+
+   // Angry eyes
+   ctx.fillStyle="#401025";
+   ctx.beginPath();
+   ctx.moveTo(x+14,y+22);
+   ctx.lineTo(x+23,y+24);
+   ctx.lineTo(x+16,y+28);
+   ctx.closePath();
+   ctx.fill();
+
+   ctx.beginPath();
+   ctx.moveTo(x+38,y+22);
+   ctx.lineTo(x+29,y+24);
+   ctx.lineTo(x+36,y+28);
+   ctx.closePath();
+   ctx.fill();
+
+   // Candy mouth
+   ctx.strokeStyle="#641631";
+   ctx.lineWidth=3;
+   ctx.beginPath();
+   ctx.arc(x+26,y+31,8,Math.PI+.25,Math.PI*2-.25);
+   ctx.stroke();
+
+   // Jelly feet
+   ctx.fillStyle=e.type===0?"#c91e62":"#dd6717";
+   ctx.beginPath();
+   ctx.ellipse(x+13,y+43,13,6,0,0,Math.PI*2);
+   ctx.ellipse(x+39,y+43,13,6,0,0,Math.PI*2);
+   ctx.fill();
+
+ }else{
+   // PEPPERMINT COOKIE BAD GUY
+   ctx.shadowColor=e.type===2?"#ff4268":"#62e6ff";
+   ctx.shadowBlur=18;
+
+   // Cookie legs
+   ctx.strokeStyle="#a7582a";
+   ctx.lineWidth=6;
+   ctx.beginPath();
+   ctx.moveTo(x+16,y+34);
+   ctx.lineTo(x+12,y+44);
+   ctx.moveTo(x+36,y+34);
+   ctx.lineTo(x+40,y+44);
+   ctx.stroke();
+
+   ctx.fillStyle="#6c321c";
+   ctx.beginPath();
+   ctx.ellipse(x+9,y+44,11,5,0,0,Math.PI*2);
+   ctx.ellipse(x+43,y+44,11,5,0,0,Math.PI*2);
+   ctx.fill();
+
+   // Cookie body
+   const cookie=ctx.createRadialGradient(
+     x+18,y+15,3,
+     x+26,y+24,27
+   );
+
+   cookie.addColorStop(0,"#fff0c9");
+   cookie.addColorStop(.45,"#d9944f");
+   cookie.addColorStop(1,"#7b3e20");
+
+   ctx.fillStyle=cookie;
+   ctx.beginPath();
+   ctx.arc(x+26,y+23,23,0,Math.PI*2);
+   ctx.fill();
+
+   ctx.strokeStyle="#6b321c";
+   ctx.lineWidth=3;
+   ctx.stroke();
+
+   // Peppermint center
+   ctx.save();
+   ctx.translate(x+26,y+23);
+
+   ctx.fillStyle="#fff";
+   ctx.beginPath();
+   ctx.arc(0,0,14,0,Math.PI*2);
+   ctx.fill();
+
+   ctx.strokeStyle=e.type===2?"#ff365f":"#31cde8";
+   ctx.lineWidth=5;
+
+   for(let i=0;i<6;i++){
+     ctx.save();
+     ctx.rotate(i*Math.PI/3);
+     ctx.beginPath();
+     ctx.arc(0,0,10,-.15,.6);
+     ctx.stroke();
+     ctx.restore();
+   }
+
+   ctx.restore();
+
+   // Angry candy eyes
+   ctx.fillStyle="#351618";
+
+   ctx.beginPath();
+   ctx.moveTo(x+12,y+15);
+   ctx.lineTo(x+22,y+18);
+   ctx.lineTo(x+14,y+21);
+   ctx.closePath();
+   ctx.fill();
+
+   ctx.beginPath();
+   ctx.moveTo(x+40,y+15);
+   ctx.lineTo(x+30,y+18);
+   ctx.lineTo(x+38,y+21);
+   ctx.closePath();
+   ctx.fill();
+
+   // Chocolate chips
+   ctx.fillStyle="#4c2418";
+
+   [
+     [14,31],
+     [38,31],
+     [26,38]
+   ].forEach(chip=>{
+     ctx.beginPath();
+     ctx.arc(x+chip[0],y+chip[1],3,0,Math.PI*2);
+     ctx.fill();
+   });
+ }
+
+ ctx.restore();
+}
+
+
+function drawBoss(){
+ if(!boss.active||!boss.alive)return;
+
+ const x=boss.x-camera;
+ const y=boss.y;
+ const t=performance.now()*.004;
+ const float=Math.sin(t)*4;
+
+ ctx.save();
+ ctx.translate(0,float);
+ ctx.shadowColor="#ff4fa7";
+ ctx.shadowBlur=30;
+
+ // Cupcake wrapper
+ const wrapper=ctx.createLinearGradient(x,y+70,x,y+boss.h);
+ wrapper.addColorStop(0,"#7fe8ff");
+ wrapper.addColorStop(.25,"#35bde5");
+ wrapper.addColorStop(1,"#116186");
+
+ ctx.fillStyle=wrapper;
+ ctx.beginPath();
+ ctx.moveTo(x+25,y+78);
+ ctx.lineTo(x+boss.w-25,y+78);
+ ctx.lineTo(x+boss.w-45,y+boss.h);
+ ctx.lineTo(x+45,y+boss.h);
+ ctx.closePath();
+ ctx.fill();
+
+ // Wrapper stripes
+ ctx.strokeStyle="rgba(255,255,255,.32)";
+ ctx.lineWidth=8;
+
+ for(let i=0;i<6;i++){
+   const stripeX=x+48+i*23;
+
+   ctx.beginPath();
+   ctx.moveTo(stripeX,y+84);
+   ctx.lineTo(stripeX-8,y+boss.h-8);
+   ctx.stroke();
+ }
+
+ // Giant frosting
+ const frosting=ctx.createRadialGradient(
+   x+85,y+25,15,
+   x+boss.w/2,y+70,120
+ );
+
+ frosting.addColorStop(0,"#fff");
+ frosting.addColorStop(.22,"#ffd4ec");
+ frosting.addColorStop(.55,"#ff72b8");
+ frosting.addColorStop(1,"#c32078");
+
+ ctx.fillStyle=frosting;
+
+ ctx.beginPath();
+ ctx.arc(x+55,y+83,42,Math.PI,0);
+ ctx.arc(x+100,y+66,55,Math.PI,0);
+ ctx.arc(x+152,y+80,45,Math.PI,0);
+ ctx.lineTo(x+190,y+100);
+ ctx.lineTo(x+20,y+100);
+ ctx.closePath();
+ ctx.fill();
+
+ // Frosting shine
+ ctx.fillStyle="rgba(255,255,255,.48)";
+ ctx.beginPath();
+ ctx.ellipse(x+83,y+48,18,10,-.5,0,Math.PI*2);
+ ctx.fill();
+
+ // Cherry bomb
+ ctx.shadowColor="#ff243c";
+ ctx.shadowBlur=20;
+ ctx.fillStyle="#ff243c";
+
+ ctx.beginPath();
+ ctx.arc(x+boss.w/2,y+16,24,0,Math.PI*2);
+ ctx.fill();
+
+ ctx.fillStyle="rgba(255,255,255,.55)";
+ ctx.beginPath();
+ ctx.arc(x+boss.w/2-8,y+8,7,0,Math.PI*2);
+ ctx.fill();
+
+ ctx.strokeStyle="#46a345";
+ ctx.lineWidth=7;
+ ctx.beginPath();
+ ctx.moveTo(x+boss.w/2+3,y-5);
+ ctx.quadraticCurveTo(x+boss.w/2+18,y-28,x+boss.w/2+34,y-21);
+ ctx.stroke();
+
+ // Angry cupcake face
+ ctx.shadowBlur=0;
+ ctx.fillStyle="#3c1230";
+
+ ctx.beginPath();
+ ctx.moveTo(x+55,y+94);
+ ctx.lineTo(x+88,y+101);
+ ctx.lineTo(x+61,y+111);
+ ctx.closePath();
+ ctx.fill();
+
+ ctx.beginPath();
+ ctx.moveTo(x+155,y+94);
+ ctx.lineTo(x+122,y+101);
+ ctx.lineTo(x+149,y+111);
+ ctx.closePath();
+ ctx.fill();
+
+ // Eye glow
+ ctx.fillStyle="#fff54a";
+
+ ctx.beginPath();
+ ctx.arc(x+70,y+102,5,0,Math.PI*2);
+ ctx.arc(x+140,y+102,5,0,Math.PI*2);
+ ctx.fill();
+
+ // Angry mouth
+ ctx.strokeStyle="#5e143b";
+ ctx.lineWidth=7;
+ ctx.beginPath();
+ ctx.arc(
+   x+boss.w/2,
+   y+124,
+   30,
+   Math.PI+.25,
+   Math.PI*2-.25
+ );
+ ctx.stroke();
+
+ // Candy-cane cannons
+ function candyCannon(cx,flip){
+   ctx.save();
+   ctx.translate(cx,y+72);
+   if(flip)ctx.scale(-1,1);
+
+   ctx.strokeStyle="#fff";
+   ctx.lineWidth=25;
+   ctx.lineCap="round";
+   ctx.beginPath();
+   ctx.moveTo(0,40);
+   ctx.lineTo(-24,12);
+   ctx.lineTo(-48,12);
+   ctx.stroke();
+
+   ctx.strokeStyle="#ff315d";
+   ctx.lineWidth=7;
+
+   for(let i=0;i<5;i++){
+     ctx.beginPath();
+     ctx.moveTo(-5-i*10,22);
+     ctx.lineTo(-14-i*10,3);
+     ctx.stroke();
+   }
+
+   ctx.fillStyle="#7a1738";
+   ctx.beginPath();
+   ctx.arc(-51,12,13,0,Math.PI*2);
+   ctx.fill();
+
+   ctx.restore();
+ }
+
+ candyCannon(x+22,false);
+ candyCannon(x+boss.w-22,true);
+
+ // Sprinkles
+ const sprinkleColors=[
+   "#fff34b",
+   "#43e5ff",
+   "#7cff75",
+   "#ff4d79",
+   "#8b5cff"
+ ];
+
+ for(let i=0;i<18;i++){
+   const sx=x+35+(i*37)%145;
+   const sy=y+45+(i*23)%48;
+
+   ctx.save();
+   ctx.translate(sx,sy);
+   ctx.rotate(i*.7);
+
+   ctx.fillStyle=sprinkleColors[i%sprinkleColors.length];
+   ctx.fillRect(-5,-2,10,4);
+
+   ctx.restore();
+ }
+
+ // Boss health bar
+ ctx.shadowBlur=0;
+
+ ctx.fillStyle="rgba(70,12,49,.85)";
+ ctx.beginPath();
+ ctx.roundRect(x,y-42,boss.w,18,9);
+ ctx.fill();
+
+ ctx.fillStyle="#fff";
+ ctx.beginPath();
+ ctx.roundRect(x+3,y-39,boss.w-6,12,6);
+ ctx.fill();
+
+ const healthWidth=(boss.w-6)*(boss.hp/boss.maxHp);
+
+ const health=ctx.createLinearGradient(
+   x,
+   y,
+   x+boss.w,
+   y
+ );
+
+ health.addColorStop(0,"#ffef4d");
+ health.addColorStop(.45,"#ff7abf");
+ health.addColorStop(1,"#ff315d");
+
+ ctx.fillStyle=health;
+ ctx.beginPath();
+ ctx.roundRect(x+3,y-39,healthWidth,12,6);
+ ctx.fill();
+
+ ctx.restore();
+}
+
+function draw(){
+ const sx=shake>0?(Math.random()-.5)*shake:0,sy=shake>0?(Math.random()-.5)*shake:0;
+ ctx.save();ctx.translate(sx,sy);
+
+ if(currentLevel===1)drawTropicalBackground();else if(currentLevel===2)drawCityBackground();else drawFortressBackground();
+ platforms.forEach(drawPlatform);
+
+ const t=performance.now();
+ ringItems.forEach(r=>{
+   if(r.got)return;
+   const x=r.x-camera,y=r.y+Math.sin(t*.004+r.p)*5;
+   ctx.save();ctx.shadowColor="#ffd21e";ctx.shadowBlur=13;
+   ctx.strokeStyle="#ffd21e";ctx.lineWidth=7;ctx.beginPath();ctx.ellipse(x,y,10,15,0,0,7);ctx.stroke();
+   ctx.restore();
+ });
+
+ emeralds.forEach(e=>{if(!e.got)drawGem(e.x-camera,e.y,e.color,1)});
+ enemies.forEach(drawEnemy);
+ drawBoss();
+
+ shots.forEach(s=>{
+    ctx.save();
+    ctx.shadowColor="#ff472e";
+    ctx.shadowBlur=15;
+    ctx.fillStyle="#ff472e";
+    ctx.beginPath();
+    ctx.arc(s.x-camera,s.y,12,0,7);
+    ctx.fill();
+    ctx.fillStyle="#ffd64a";
+    ctx.beginPath();
+    ctx.arc(s.x-camera,s.y,5,0,7);
+    ctx.fill();
+    ctx.restore();
+});
+
+ particles.forEach(p=>{
+   ctx.globalAlpha=Math.max(0,p.life/55);ctx.fillStyle=p.color;
+   ctx.beginPath();ctx.arc(p.x-camera,p.y,p.size,0,7);ctx.fill();ctx.globalAlpha=1;
+ });
+
+ drawPlayer();
+ ctx.restore();
+
+ if(flash>0){
+   ctx.fillStyle=`rgba(255,255,255,${flash/40})`;
+   ctx.fillRect(0,0,canvas.width,canvas.height);
+ }
+}
+
+function loop(){
+ if(!running)return;
+ update();draw();requestAnimationFrame(loop);
+}
+
+buildLevel(1);
+draw();
+})();
+</script>
+</body>
+</html>
