@@ -453,6 +453,16 @@ footer strong{color:#57ff00}
       </div>
 
       <div class="metric">
+        <small>Ebitda $ TTM</small>
+        <strong id="ebitda">-</strong>
+      </div>
+
+      <div class="metric">
+        <small>Ebitda % Growth YoY</small>
+        <strong id="ebitdaGrowth">-</strong>
+      </div>
+
+      <div class="metric">
         <small>Debt</small>
         <strong id="debt">-</strong>
       </div>
@@ -570,6 +580,14 @@ function colorValue(id, value, type){
       el.classList.add("green");
     }
   }
+
+  if(type === "ebitdaGrowth"){
+    if(text.includes("+")){
+        el.classList.add("green");
+    }else if(text.includes("-")){
+        el.classList.add("red");
+    }
+}
 
   if(type === "debt"){
     if(text.includes("-")){
@@ -762,6 +780,12 @@ function searchCompany(){
       "% Net Income Growth 1Y",
       "Net Income Growth 1Y"
     ]);
+  
+    document.getElementById("ebitda").innerText =
+  getValue(result, ["Ebitda $ (TTM)", "EBITDA $ (TTM)"]);
+
+document.getElementById("ebitdaGrowth").innerText =
+  getValue(result, ["Ebitda % Growth YoY", "EBITDA % Growth YoY"]);
 
   document.getElementById("debt").innerText =
     getValue(result,["Debt"]);
@@ -794,6 +818,12 @@ function searchCompany(){
     document.getElementById("incomeGrowth").innerText,
     "incomeGrowth"
   );
+
+  colorValue(
+  "ebitdaGrowth",
+  document.getElementById("ebitdaGrowth").innerText,
+  "ebitdaGrowth"
+);
 
   colorValue(
     "debt",
